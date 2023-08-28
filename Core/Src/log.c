@@ -55,7 +55,6 @@ void Log_Set_Level(LOG_LEVEL level)
 }
 
 
-
 LOG_LEVEL Log_Get_Level(void)
 {
     return g_log_level;
