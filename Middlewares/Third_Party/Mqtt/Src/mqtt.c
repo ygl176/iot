@@ -18,7 +18,6 @@
 #include "MQTTPublish.h"
 #include "MQTTSubscribe.h"
 #include "MQTTUnsubscribe.h"
-#include "bsp_esp8266.h"
 
 
 // const uint8_t client_id[] = CLIENT_ID;
@@ -61,7 +60,7 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
 
 
 /**
- * @brief ¶Ï¿ªÁ¬½Ó
+ * @brief ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
  * 
  */
 void mqtt_disconnect()
@@ -74,7 +73,7 @@ void mqtt_disconnect()
 }
 
 /**
- * @brief ¶©ÔÄÏûÏ¢
+ * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
  * 
  * @param sub_topic 
  * @param req_qos 
@@ -135,7 +134,7 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 
 
 /**
- * @brief ·¢²¼ÏûÏ¢
+ * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
  * 
  * @return true 
  * @return false 
@@ -158,7 +157,7 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 
 
 /**
- * @brief ·¢ËÍÐÄÌø°ü
+ * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  * 
  * @return true 
  * @return false 
