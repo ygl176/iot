@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #include "common.h"
+#include "log.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -111,6 +112,9 @@ void HAL_Free(_IN_ void *ptr)
     vPortFree(ptr);
 }
 
+
+#ifdef MUTEX
+
 void *HAL_MutexCreate(void)
 {
 	return (void *)osMutexNew(NULL);
@@ -123,7 +127,7 @@ void HAL_MutexDestroy(_IN_ void * mutex)
 	
     if(osOK != (ret = osMutexDelete((osMutexId)mutex)))
     {
-		HAL_Printf("HAL_MutexDestroy err, err:%d\n\r",ret);
+		Log_e("HAL_MutexDestroy err, err:%d\n\r",ret);
 	}
 }
 
@@ -133,7 +137,7 @@ void HAL_MutexLock(_IN_ void * mutex)
 
 	if(osOK != (ret = osMutexWait((osMutexId)mutex, osWaitForever)))
 	{
-		HAL_Printf("HAL_MutexLock err, err:%d\n\r",ret);
+		Log_e("HAL_MutexLock err, err:%d\n\r",ret);
 	}
 }
 
@@ -143,10 +147,25 @@ void HAL_MutexUnlock(_IN_ void * mutex)
 
 	if(osOK != (ret = osMutexRelease((osMutexId)mutex)))
 	{
-		HAL_Printf("HAL_MutexUnlock err, err:%d\n\r",ret);
+		Log_e("HAL_MutexUnlock err, err:%d\n\r",ret);
 	}	
 }
-#else
+
+#endif	//MUTEX
+
+#ifdef QUEUE
+void *HAL_QueueCreate(uint32_t QueLen, uint32_t ItemSize)
+{
+	osStatus ret;
+
+	if(osOK != (ret = osMessageQueueNew(QueLen, ItemSize, NULL)))
+	{
+		Log_e("HAL_QueueCreate err, err:%d\n\r", ret);
+	}
+}
+#endif  //QUEUE
+
+#else	//OS_USED
 void hal_thread_create(void** threadId, void (*fn)(void*), void* arg)
 {
 
@@ -166,6 +185,8 @@ void HAL_Free(_IN_ void *ptr)
 {
    free(ptr);
 }
+
+#ifdef MUTEX
 
 void *HAL_MutexCreate(void)
 {
@@ -188,7 +209,9 @@ void HAL_MutexUnlock(_IN_ void* mutex)
 	return;
 }
 
-#endif
+#endif	//MUTEX
+
+#endif	//OS_USED else
 
 
 #ifdef __cplusplus

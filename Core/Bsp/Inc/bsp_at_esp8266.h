@@ -91,26 +91,57 @@ typedef struct
     uint8_t* buf;
     uint16_t buf_size;
 
-}at_response;
+}response;
 
+typedef response *response_t;
 
 typedef struct
 {
     esp8266_status status;  //esp8266外设状态
 
-    void *recv_que;         //消息接收队列
+    void *recv_que;         //消息处理缓冲区
 
     void *lock;             //互斥信号量
 
-    at_response *resp;      //主动请求响应结果，同一时间只能有一个主动请求
     bool resp_notice;       //接收到消息
+    response_t resp;      //主动请求响应结果，同一时间只能有一个主动请求
 
-    // ParserFunc parser;
+    // ParserFunc parse;
 }bsp_esp8266;
 
 
 typedef bsp_esp8266 * tbsp_esp8266;
 
+/**
+ * @brief 主动请求响应空间申请
+ * 
+ * @param buf_len 
+ * @return response_t 
+ */
+response_t resp_malloc(uint32_t buf_len);
+
+/**
+ * @brief 主动请求响应空间释放
+ * 
+ * @param resp 
+ */
+void resp_release(response_t resp);
+
+/**
+ * @brief 获取 esp 设备抽象指针
+ * 
+ * @return tbsp_esp8266 
+ */
+tbsp_esp8266 dev_esp_get();
+
+/**
+ * @brief 初始化 esp 外设抽象
+ * 
+ * @param esp 
+ * @return true 
+ * @return false 
+ */
+bool dev_esp_init(tbsp_esp8266 p_esp);
 
 /**
  * @brief ESP8266 模块初始化
@@ -118,13 +149,13 @@ typedef bsp_esp8266 * tbsp_esp8266;
  * @return true 
  * @return false 
  */
-bool ESP8266_Init(tbsp_esp8266 esp);
+bool ESP8266_Init();
 
 /**
  * @brief 模块复位
  * 
  */
-void ESP8266_Rst(tbsp_esp8266 esp);
+void ESP8266_Rst();
 
 /**
  * @brief 发送 AT 指令
@@ -132,10 +163,9 @@ void ESP8266_Rst(tbsp_esp8266 esp);
  * @param cmd 指令字符串
  * @param reply  期望响应字符串
  * @param wait_ms 最大等待时间
- * @return true 
- * @return false 
+ * @return at_response 返回响应内容，返回结果字符串为空时报错
  */
-bool ESP8266_Cmd(tbsp_esp8266 esp, char *cmd, uint32_t wait_ms);
+response ESP8266_Cmd(response_t resp, char *cmd, uint32_t wait_ms);
 
 /**
  * @brief AT 指令测试
@@ -143,7 +173,7 @@ bool ESP8266_Cmd(tbsp_esp8266 esp, char *cmd, uint32_t wait_ms);
  * @return true 
  * @return false 
  */
-bool ESP8266_AT_Test(tbsp_esp8266 esp);
+bool ESP8266_AT_Test();
 
 /**
  * @brief ESP8266 模式设置
@@ -152,7 +182,7 @@ bool ESP8266_AT_Test(tbsp_esp8266 esp);
  * @return true 
  * @return false 
  */
-bool ESP8266_Mode_Set(tbsp_esp8266 esp, eESP_Mode eMode);
+bool ESP8266_Mode_Set(eESP_Mode eMode);
 
 /**
  * @brief 连接指定Wifi
@@ -162,7 +192,7 @@ bool ESP8266_Mode_Set(tbsp_esp8266 esp, eESP_Mode eMode);
  * @return true 
  * @return false 
  */
-bool ESP8266_JoinAP(tbsp_esp8266 esp, char *pSSID, char *pPassWord);
+bool ESP8266_JoinAP(char *pSSID, char *pPassWord);
 
 /**
  * @brief 使能DHCP
@@ -179,7 +209,7 @@ bool ESP8266_JoinAP(tbsp_esp8266 esp, char *pSSID, char *pPassWord);
  * @return true 
  * @return false 
  */
-bool ESP8266_BuildAP(tbsp_esp8266 esp, char *pSSID, char *pPassWord, eAP_PsdMode eMode);
+bool ESP8266_BuildAP(char *pSSID, char *pPassWord, eAP_PsdMode eMode);
 
 /**
  * @brief 连接服务器
@@ -191,14 +221,14 @@ bool ESP8266_BuildAP(tbsp_esp8266 esp, char *pSSID, char *pPassWord, eAP_PsdMode
  * @return true 
  * @return false 
  */
-bool ESP8266_Link_Server(tbsp_esp8266 esp, eNetPro eNet, char *ip, char *ComNum, eID_NO id);
+bool ESP8266_Link_Server(eNetPro eNet, char *ip, char *ComNum, eID_NO id);
 
 /**
  * @brief 获取wifi连接状态
  * 
  * @return eAP_Link_Sta 
  */
-eAP_Link_Sta ESP8266_GET_LinkStatus(tbsp_esp8266 esp);
+eAP_Link_Sta ESP8266_GET_LinkStatus();
 
 /**
  * @brief 获取端口连接状态
@@ -206,7 +236,7 @@ eAP_Link_Sta ESP8266_GET_LinkStatus(tbsp_esp8266 esp);
  * @return uint8_t 
  * 低5位有效，每一位表示一个端口，连接置 1，否则置 0
  */
-uint8_t ESP8266_Get_IdLinkStatus(tbsp_esp8266 esp);
+uint8_t ESP8266_Get_IdLinkStatus();
 
 /**
  * @brief 请求 ESP8266 的 AP IP地址
@@ -216,7 +246,7 @@ uint8_t ESP8266_Get_IdLinkStatus(tbsp_esp8266 esp);
  * @return true 
  * @return false 
  */
-bool ESP8266_Inquire_ApIp(tbsp_esp8266 esp, char *pApIp, uint8_t buf_len);
+bool ESP8266_Inquire_ApIp(char *pApIp, uint8_t buf_len);
 
 /**
  * @brief 使能透传模式
@@ -224,13 +254,13 @@ bool ESP8266_Inquire_ApIp(tbsp_esp8266 esp, char *pApIp, uint8_t buf_len);
  * @return true 
  * @return false 
  */
-bool ESP8266_UnvarnishSend(tbsp_esp8266 esp);
+bool ESP8266_UnvarnishSend();
 
 /**
  * @brief 关闭透传模式
  * 
  */
-void ESP8266_ExitUnvarnishSend(tbsp_esp8266 esp);
+void ESP8266_ExitUnvarnishSend();
 
 /**
  * @brief ESP8266向服务器发送字符串
@@ -241,14 +271,17 @@ void ESP8266_ExitUnvarnishSend(tbsp_esp8266 esp);
  * @return true 
  * @return false 
  */
-bool ESP8266_SendStr(tbsp_esp8266 esp, char *pStr, uint32_t StrLen, eID_NO Id);
+bool ESP8266_SendStr(char *pStr, uint32_t StrLen, eID_NO Id);
 
 /**
  * @brief 从服务器接收字符串
  * 
  * @return char* 
  */
-char* ESP8266_RecStr(tbsp_esp8266 esp);
+char* ESP8266_RecStr();
+
+
+void esp_parse(void);
 
 #ifdef __cplusplus
 }
