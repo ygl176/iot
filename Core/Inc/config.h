@@ -22,8 +22,12 @@
 #define OS_USED
 //系统功能选择
 #ifdef OS_USED
+//互斥信号量
 #define MUTEX
+//队列功能
 #define QUEUE
+//计数信号量
+#define COUNT_SEM
 #endif
 
 //使能日志输出

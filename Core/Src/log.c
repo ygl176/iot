@@ -78,12 +78,15 @@ void Log_writter(const char *file, const char *func, const int line, const int l
 
     va_list ap;
 	char bufs[LOG_BUF_LEN];
+    uint32_t count = 0;
 
 	va_start(ap, fmt);
-	vsnprintf(bufs, sizeof(bufs), fmt, ap);
+	count = vsnprintf(bufs, sizeof(bufs), fmt, ap);
 	va_end(ap);
 
-    usart_printf(&LOG_UART, "\r\n");
+    HAL_UART_Transmit(&LOG_UART, bufs, count, HAL_MAX_DELAY);
+
+    HAL_UART_Transmit(&LOG_UART, "\r\n", 2, HAL_MAX_DELAY);
 
     /** printf串口输出日志 **/
     // printf("%s|%s|%s(%d): ", level_str[level], file_name, func, line);

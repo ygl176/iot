@@ -14,6 +14,7 @@
 
 #include "stdbool.h"
 #include "stdint.h"
+#include "ringbuff.h" 
 #include "export_err.h"
 
 
@@ -56,12 +57,6 @@ typedef enum
 
 typedef enum
 {
-	eTCP,
-	eUDP,
-}eNetPro;
-
-typedef enum
-{
 	Multiple_ID_0 = 0,
 	Multiple_ID_1 = 1,
 	Multiple_ID_2 = 2,
@@ -97,14 +92,20 @@ typedef response *response_t;
 
 typedef struct
 {
-    esp8266_status status;  //esp8266外设状态
+    esp8266_status status;      //esp8266外设状态
 
-    void *recv_que;         //消息处理缓冲区
+    ring_buff_t p_ring_buff;    //串口环状缓冲区
 
-    void *lock;             //互斥信号量
+    void *sema_rx;              //串口缓冲区字符接收信号量
+    char *recv;                 //消息处理缓冲区
+    uint32_t recv_len;
+    uint32_t cur_recv_len;
 
-    bool resp_notice;       //接收到消息
-    response_t resp;      //主动请求响应结果，同一时间只能有一个主动请求
+    void *lock;                 //互斥信号量
+
+    bool resp_notice;           //接收到消息
+    bool resp_status;           //响应结果
+    response_t resp;            //主动请求响应结果，同一时间只能有一个主动请求
 
     // ParserFunc parse;
 }bsp_esp8266;
@@ -161,11 +162,11 @@ void ESP8266_Rst();
  * @brief 发送 AT 指令
  * 
  * @param cmd 指令字符串
- * @param reply  期望响应字符串
  * @param wait_ms 最大等待时间
- * @return at_response 返回响应内容，返回结果字符串为空时报错
+ * @param fmt 打印内容
+ * @return
  */
-response ESP8266_Cmd(response_t resp, char *cmd, uint32_t wait_ms);
+bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...);
 
 /**
  * @brief AT 指令测试
@@ -174,6 +175,17 @@ response ESP8266_Cmd(response_t resp, char *cmd, uint32_t wait_ms);
  * @return false 
  */
 bool ESP8266_AT_Test();
+
+/**
+ * @brief 串口回显设置
+ * 
+ * @param mode 
+ * 1 开启回显
+ * 0 关闭回显
+ * @return true
+ * @return false
+ */
+bool ESP8266_ATE(uint8_t mode);
 
 /**
  * @brief ESP8266 模式设置
@@ -221,22 +233,22 @@ bool ESP8266_BuildAP(char *pSSID, char *pPassWord, eAP_PsdMode eMode);
  * @return true 
  * @return false 
  */
-bool ESP8266_Link_Server(eNetPro eNet, char *ip, char *ComNum, eID_NO id);
+bool ESP8266_Link_Server(char* net, char *ip, char *ComNum, eID_NO id);
 
 /**
- * @brief 获取wifi连接状态
+ * @brief 获取单端口连接状态
  * 
  * @return eAP_Link_Sta 
  */
 eAP_Link_Sta ESP8266_GET_LinkStatus();
 
 /**
- * @brief 获取端口连接状态
+ * @brief 获取多端口连接状态
  * 
  * @return uint8_t 
  * 低5位有效，每一位表示一个端口，连接置 1，否则置 0
  */
-uint8_t ESP8266_Get_IdLinkStatus();
+uint16_t ESP8266_Get_IdLinkStatus();
 
 /**
  * @brief 请求 ESP8266 的 AP IP地址
@@ -280,7 +292,10 @@ bool ESP8266_SendStr(char *pStr, uint32_t StrLen, eID_NO Id);
  */
 char* ESP8266_RecStr();
 
-
+/**
+ * @brief esp接收消息处理
+ * 
+ */
 void esp_parse(void);
 
 #ifdef __cplusplus

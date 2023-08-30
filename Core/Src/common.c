@@ -27,11 +27,6 @@ extern "C" {
 extern UART_HandleTypeDef PRINTF_UART;
 static uint8_t ch;
 
-//uint16_t 类型置位、清除
-#define SET_EVENT(event, arg)               ATOMIC_SETH_BIT((event), (arg))
-#define CLEAR_EVENT(event, arg)             ATOMIC_CLEARH_BIT((event), (arg))
-#define GET_EVEVT(event, arg)               ((event) & (arg))
-
 #ifdef __GNUC__
 //重写这个函数,重定向printf函数到串口
 PUTCHAR_PROTOTYPE
@@ -123,7 +118,7 @@ void *HAL_MutexCreate(void)
 
 void HAL_MutexDestroy(_IN_ void * mutex)
 {
-	osStatus ret;
+	osStatus_t ret;
 	
     if(osOK != (ret = osMutexDelete((osMutexId)mutex)))
     {
@@ -133,7 +128,7 @@ void HAL_MutexDestroy(_IN_ void * mutex)
 
 void HAL_MutexLock(_IN_ void * mutex)
 {
-	osStatus ret;
+	osStatus_t ret;
 
 	if(osOK != (ret = osMutexWait((osMutexId)mutex, osWaitForever)))
 	{
@@ -143,7 +138,7 @@ void HAL_MutexLock(_IN_ void * mutex)
 
 void HAL_MutexUnlock(_IN_ void * mutex)
 {
-	osStatus ret;
+	osStatus_t ret;
 
 	if(osOK != (ret = osMutexRelease((osMutexId)mutex)))
 	{
@@ -154,16 +149,39 @@ void HAL_MutexUnlock(_IN_ void * mutex)
 #endif	//MUTEX
 
 #ifdef QUEUE
-void *HAL_QueueCreate(uint32_t QueLen, uint32_t ItemSize)
+void *HAL_QueueCreate(_IN_ uint32_t QueLen, _IN_ uint32_t ItemSize)
 {
-	osStatus ret;
-
-	if(osOK != (ret = osMessageQueueNew(QueLen, ItemSize, NULL)))
-	{
-		Log_e("HAL_QueueCreate err, err:%d\n\r", ret);
-	}
+	return osMessageQueueNew(QueLen, ItemSize, NULL);
 }
 #endif  //QUEUE
+
+#ifdef COUNT_SEM
+void *HAL_SemaphoreCreate(_IN_ uint32_t max_count, _IN_ uint32_t init_count)
+{
+	return osSemaphoreNew(max_count, init_count, NULL);
+}
+
+bool HAL_SemaphoreWait(_IN_ void* semaphore, uint32_t wait_ms)
+{
+	if(osOK != osSemaphoreAcquire(semaphore, wait_ms))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void HAL_SemaphoreRelease(_IN_ void* semaphore)
+{
+	osStatus_t ret;
+
+	if(osOK != (ret = osSemaphoreRelease(semaphore)))
+	{
+		Log_e("HAL_SemaphoreRelease err, err:%d\n\r", ret);
+	}
+}
+
+#endif	//COUNT_SEM
 
 #else	//OS_USED
 void hal_thread_create(void** threadId, void (*fn)(void*), void* arg)

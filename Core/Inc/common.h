@@ -21,6 +21,11 @@ extern "C" {
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif
 
+//uint16_t 类型置位、清除
+#define SET_EVENT(event, arg)               ATOMIC_SETH_BIT((event), (arg))
+#define CLEAR_EVENT(event, arg)             ATOMIC_CLEARH_BIT((event), (arg))
+#define GET_EVEVT(event, arg)               ((event) & (arg))
+
 /**
  * @brief 指定串口输出字符串
  * 
@@ -60,6 +65,12 @@ void HAL_MutexUnlock(_IN_ void* mutex);
 #ifdef QUEUE
 void *HAL_QueueCreate(uint32_t QueLen, uint32_t ItemSize);
 #endif  //QUEUE
+
+#ifdef COUNT_SEM
+void *HAL_SemaphoreCreate(_IN_ uint32_t max_count, _IN_ uint32_t init_count);
+bool HAL_SemaphoreWait(_IN_ void* semaphore, uint32_t wait_ms);
+void HAL_SemaphoreRelease(_IN_ void* semaphore);
+#endif
 
 void *HAL_Malloc(_IN_ uint32_t size);
 void HAL_Free(_IN_ void *ptr);
