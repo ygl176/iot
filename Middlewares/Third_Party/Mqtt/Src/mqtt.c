@@ -60,7 +60,7 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
 
 
 /**
- * @brief ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @brief ¶Ï¿ªÁ¬½Ó
  * 
  */
 void mqtt_disconnect()
@@ -73,7 +73,7 @@ void mqtt_disconnect()
 }
 
 /**
- * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+ * @brief ¶©ÔÄÏûÏ¢
  * 
  * @param sub_topic 
  * @param req_qos 
@@ -134,7 +134,7 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 
 
 /**
- * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+ * @brief ·¢²¼ÏûÏ¢
  * 
  * @return true 
  * @return false 
@@ -157,7 +157,7 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 
 
 /**
- * @brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @brief ·¢ËÍÐÄÌø°ü
  * 
  * @return true 
  * @return false 
