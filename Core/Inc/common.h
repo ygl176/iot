@@ -49,13 +49,21 @@ typedef void * osThreadId;
 void hal_thread_create(volatile void* threadId, uint16_t stackSize, int Priority, void (*fn)(void*), void* arg);
 void hal_thread_destroy(void* threadId);
 void HAL_SleepMs(_IN_ uint32_t ms);
+
+#ifdef MUTEX
 void *HAL_MutexCreate(void);
 void HAL_MutexDestroy(_IN_ void* mutex);
 void HAL_MutexLock(_IN_ void* mutex);
 void HAL_MutexUnlock(_IN_ void* mutex);
+#endif  //MUTEX
+
+#ifdef QUEUE
+void *HAL_QueueCreate(uint32_t QueLen, uint32_t ItemSize);
+#endif  //QUEUE
+
 void *HAL_Malloc(_IN_ uint32_t size);
 void HAL_Free(_IN_ void *ptr);
-#endif
+#endif  //OS_USED
 
 #ifdef __cplusplus
 }

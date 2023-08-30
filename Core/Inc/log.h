@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -61,12 +62,21 @@ LOG_LEVEL Log_Get_Level(void);
  */
 void Log_writter(const char *file, const char *func, const int line, const int level, const char *fmt, ...);
 
+#ifdef LOG
 
 #define Log_d(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_DEBUG, args)
 #define Log_i(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_INFO, args)
 #define Log_w(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_WARN, args)
 #define Log_e(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_ERROR, args)
 
+#else
+
+#define Log_d(args...)
+#define Log_i(args...)
+#define Log_w(args...)
+#define Log_e(args...)
+
+#endif  //LOG
 
 #ifdef __cplusplus
 }

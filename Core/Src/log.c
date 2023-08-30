@@ -85,6 +85,7 @@ void Log_writter(const char *file, const char *func, const int line, const int l
 
     usart_printf(&LOG_UART, "\r\n");
 
+    /** printf串口输出日志 **/
     // printf("%s|%s|%s(%d): ", level_str[level], file_name, func, line);
 
     // va_list ap;

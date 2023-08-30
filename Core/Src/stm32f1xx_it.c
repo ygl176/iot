@@ -22,6 +22,8 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ringbuff.h"
+#include "log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,7 +66,7 @@ extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN EV */
-
+extern sRingbuff esp_ring_buff;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -241,7 +243,17 @@ void TIM1_UP_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+  uint8_t ch;
 
+  if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
+  {
+      ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
+
+      if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, &ch, 1))
+      {
+          Log_e("ring buff push err");
+      }
+  }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
