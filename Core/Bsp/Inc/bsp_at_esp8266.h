@@ -34,9 +34,9 @@ typedef void (*ParserFunc)(void *userContex);
 
 typedef enum
 {
-    ESP8266_UNINITIALIZED = 0,  //æœªåˆå§‹åŒ–
-    ESP8266_INITIALIZED,        //åˆå§‹åŒ–
-    ESP8266_BUSY,               //å¿™
+    ESP8266_UNINITIALIZED = 0,  //Î´³õÊ¼»¯
+    ESP8266_INITIALIZED,        //³õÊ¼»¯
+    ESP8266_BUSY,               //Ã¦
 }esp8266_status;
 
 typedef enum
@@ -67,10 +67,10 @@ typedef enum
 
 typedef enum
 {
-    GET_FAIL = 0,       //è·å–çŠ¶æ€å¤±è´¥
-    GOT_IP = 2,         //è·å¾—IP
-    CONNECT,            //å»ºç«‹è¿æ¥
-    N_CONNECT,          //å¤±å»è¿æ¥
+    GET_FAIL = 0,       //»ñÈ¡×´Ì¬Ê§°Ü
+    GOT_IP = 2,         //»ñµÃIP
+    CONNECT,            //½¨Á¢Á¬½Ó
+    N_CONNECT,          //Ê§È¥Á¬½Ó
 }eAP_Link_Sta;
 
 typedef enum
@@ -83,7 +83,7 @@ typedef enum
 
 typedef struct
 {
-    uint8_t* buf;
+    char* buf;
     uint16_t buf_size;
 
 }response;
@@ -92,20 +92,20 @@ typedef response *response_t;
 
 typedef struct
 {
-    esp8266_status status;      //esp8266å¤–è®¾çŠ¶æ€
+    esp8266_status status;      //esp8266ÍâÉè×´Ì¬
 
-    ring_buff_t p_ring_buff;    //ä¸²å£ç¯çŠ¶ç¼“å†²åŒº
+    ring_buff_t p_ring_buff;    //´®¿Ú»·×´»º³åÇø
 
-    void *sema_rx;              //ä¸²å£ç¼“å†²åŒºå­—ç¬¦æ¥æ”¶ä¿¡å·é‡
-    char *recv;                 //æ¶ˆæ¯å¤„ç†ç¼“å†²åŒº
+    void *sema_rx;              //´®¿Ú»º³åÇø×Ö·û½ÓÊÕĞÅºÅÁ¿
+    char *recv;                 //ÏûÏ¢´¦Àí»º³åÇø
     uint32_t recv_len;
     uint32_t cur_recv_len;
 
-    void *lock;                 //äº’æ–¥ä¿¡å·é‡
+    void *lock;                 //»¥³âĞÅºÅÁ¿
 
-    bool resp_notice;           //æ¥æ”¶åˆ°æ¶ˆæ¯
-    bool resp_status;           //å“åº”ç»“æœ
-    response_t resp;            //ä¸»åŠ¨è¯·æ±‚å“åº”ç»“æœï¼ŒåŒä¸€æ—¶é—´åªèƒ½æœ‰ä¸€ä¸ªä¸»åŠ¨è¯·æ±‚
+    bool resp_notice;           //½ÓÊÕµ½ÏûÏ¢
+    bool resp_status;           //ÏìÓ¦½á¹û
+    response_t resp;            //Ö÷¶¯ÇëÇóÏìÓ¦½á¹û£¬Í¬Ò»Ê±¼äÖ»ÄÜÓĞÒ»¸öÖ÷¶¯ÇëÇó
 
     // ParserFunc parse;
 }bsp_esp8266;
@@ -114,7 +114,7 @@ typedef struct
 typedef bsp_esp8266 * tbsp_esp8266;
 
 /**
- * @brief ä¸»åŠ¨è¯·æ±‚å“åº”ç©ºé—´ç”³è¯·
+ * @brief Ö÷¶¯ÇëÇóÏìÓ¦¿Õ¼äÉêÇë
  * 
  * @param buf_len 
  * @return response_t 
@@ -122,21 +122,21 @@ typedef bsp_esp8266 * tbsp_esp8266;
 response_t resp_malloc(uint32_t buf_len);
 
 /**
- * @brief ä¸»åŠ¨è¯·æ±‚å“åº”ç©ºé—´é‡Šæ”¾
+ * @brief Ö÷¶¯ÇëÇóÏìÓ¦¿Õ¼äÊÍ·Å
  * 
  * @param resp 
  */
 void resp_release(response_t resp);
 
 /**
- * @brief è·å– esp è®¾å¤‡æŠ½è±¡æŒ‡é’ˆ
+ * @brief »ñÈ¡ esp Éè±¸³éÏóÖ¸Õë
  * 
  * @return tbsp_esp8266 
  */
 tbsp_esp8266 dev_esp_get();
 
 /**
- * @brief åˆå§‹åŒ– esp å¤–è®¾æŠ½è±¡
+ * @brief ³õÊ¼»¯ esp ÍâÉè³éÏó
  * 
  * @param esp 
  * @return true 
@@ -145,7 +145,7 @@ tbsp_esp8266 dev_esp_get();
 bool dev_esp_init(tbsp_esp8266 p_esp);
 
 /**
- * @brief ESP8266 æ¨¡å—åˆå§‹åŒ–
+ * @brief ESP8266 Ä£¿é³õÊ¼»¯
  * 
  * @return true 
  * @return false 
@@ -153,23 +153,23 @@ bool dev_esp_init(tbsp_esp8266 p_esp);
 bool ESP8266_Init();
 
 /**
- * @brief æ¨¡å—å¤ä½
+ * @brief Ä£¿é¸´Î»
  * 
  */
 void ESP8266_Rst();
 
 /**
- * @brief å‘é€ AT æŒ‡ä»¤
+ * @brief ·¢ËÍ AT Ö¸Áî
  * 
- * @param cmd æŒ‡ä»¤å­—ç¬¦ä¸²
- * @param wait_ms æœ€å¤§ç­‰å¾…æ—¶é—´
- * @param fmt æ‰“å°å†…å®¹
+ * @param cmd Ö¸Áî×Ö·û´®
+ * @param wait_ms ×î´óµÈ´ıÊ±¼ä
+ * @param fmt ´òÓ¡ÄÚÈİ
  * @return
  */
 bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...);
 
 /**
- * @brief AT æŒ‡ä»¤æµ‹è¯•
+ * @brief AT Ö¸Áî²âÊÔ
  * 
  * @return true 
  * @return false 
@@ -177,18 +177,18 @@ bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...);
 bool ESP8266_AT_Test();
 
 /**
- * @brief ä¸²å£å›æ˜¾è®¾ç½®
+ * @brief ´®¿Ú»ØÏÔÉèÖÃ
  * 
  * @param mode 
- * 1 å¼€å¯å›æ˜¾
- * 0 å…³é—­å›æ˜¾
+ * 1 ¿ªÆô»ØÏÔ
+ * 0 ¹Ø±Õ»ØÏÔ
  * @return true
  * @return false
  */
 bool ESP8266_ATE(uint8_t mode);
 
 /**
- * @brief ESP8266 æ¨¡å¼è®¾ç½®
+ * @brief ESP8266 Ä£Ê½ÉèÖÃ
  * 
  * @param eMode AP, STA, AP/STA
  * @return true 
@@ -197,7 +197,7 @@ bool ESP8266_ATE(uint8_t mode);
 bool ESP8266_Mode_Set(eESP_Mode eMode);
 
 /**
- * @brief è¿æ¥æŒ‡å®šWifi
+ * @brief Á¬½ÓÖ¸¶¨Wifi
  * 
  * @param pSSID 
  * @param pPassWord 
@@ -207,51 +207,51 @@ bool ESP8266_Mode_Set(eESP_Mode eMode);
 bool ESP8266_JoinAP(char *pSSID, char *pPassWord);
 
 /**
- * @brief ä½¿èƒ½DHCP
+ * @brief Ê¹ÄÜDHCP
  * 
  */
 // bool ESP8266_DHCP_CUR(void);
 
 /**
- * @brief è®¾ç½® ESP8266 APæ¨¡å¼çŠ¶æ€
+ * @brief ÉèÖÃ ESP8266 APÄ£Ê½×´Ì¬
  * 
  * @param pSSID 
  * @param pPassWord 
- * @param eMode åŠ å¯†æ ¼å¼
+ * @param eMode ¼ÓÃÜ¸ñÊ½
  * @return true 
  * @return false 
  */
 bool ESP8266_BuildAP(char *pSSID, char *pPassWord, eAP_PsdMode eMode);
 
 /**
- * @brief è¿æ¥æœåŠ¡å™¨
+ * @brief Á¬½Ó·şÎñÆ÷
  * 
- * @param eNet è¿æ¥æ–¹å¼
- * @param ip æœåŠ¡å™¨ipåœ°å€
- * @param ComNum æœåŠ¡å™¨ç«¯å£
- * @param id æœ¬åœ°ç«¯å£
+ * @param eNet Á¬½Ó·½Ê½
+ * @param ip ·şÎñÆ÷ipµØÖ·
+ * @param ComNum ·şÎñÆ÷¶Ë¿Ú
+ * @param id ±¾µØ¶Ë¿Ú
  * @return true 
  * @return false 
  */
 bool ESP8266_Link_Server(char* net, char *ip, char *ComNum, eID_NO id);
 
 /**
- * @brief è·å–å•ç«¯å£è¿æ¥çŠ¶æ€
+ * @brief »ñÈ¡µ¥¶Ë¿ÚÁ¬½Ó×´Ì¬
  * 
  * @return eAP_Link_Sta 
  */
 eAP_Link_Sta ESP8266_GET_LinkStatus();
 
 /**
- * @brief è·å–å¤šç«¯å£è¿æ¥çŠ¶æ€
+ * @brief »ñÈ¡¶à¶Ë¿ÚÁ¬½Ó×´Ì¬
  * 
  * @return uint8_t 
- * ä½5ä½æœ‰æ•ˆï¼Œæ¯ä¸€ä½è¡¨ç¤ºä¸€ä¸ªç«¯å£ï¼Œè¿æ¥ç½® 1ï¼Œå¦åˆ™ç½® 0
+ * µÍ5Î»ÓĞĞ§£¬Ã¿Ò»Î»±íÊ¾Ò»¸ö¶Ë¿Ú£¬Á¬½ÓÖÃ 1£¬·ñÔòÖÃ 0
  */
 uint16_t ESP8266_Get_IdLinkStatus();
 
 /**
- * @brief è¯·æ±‚ ESP8266 çš„ AP IPåœ°å€
+ * @brief ÇëÇó ESP8266 µÄ AP IPµØÖ·
  * 
  * @param pApIp 
  * @param buf_len 
@@ -261,7 +261,7 @@ uint16_t ESP8266_Get_IdLinkStatus();
 bool ESP8266_Inquire_ApIp(char *pApIp, uint8_t buf_len);
 
 /**
- * @brief ä½¿èƒ½é€ä¼ æ¨¡å¼
+ * @brief Ê¹ÄÜÍ¸´«Ä£Ê½
  * 
  * @return true 
  * @return false 
@@ -269,34 +269,34 @@ bool ESP8266_Inquire_ApIp(char *pApIp, uint8_t buf_len);
 bool ESP8266_UnvarnishSend();
 
 /**
- * @brief å…³é—­é€ä¼ æ¨¡å¼
+ * @brief ¹Ø±ÕÍ¸´«Ä£Ê½
  * 
  */
 void ESP8266_ExitUnvarnishSend();
 
 /**
- * @brief ESP8266å‘æœåŠ¡å™¨å‘é€å­—ç¬¦ä¸²
+ * @brief ESP8266Ïò·şÎñÆ÷·¢ËÍ×Ö·û´®
  * 
  * @param pStr 
  * @param StrLen 
- * @param Id æœ¬åœ°ç«¯å£
+ * @param Id ±¾µØ¶Ë¿Ú
  * @return true 
  * @return false 
  */
 bool ESP8266_SendStr(char *pStr, uint32_t StrLen, eID_NO Id);
 
 /**
- * @brief ä»æœåŠ¡å™¨æ¥æ”¶å­—ç¬¦ä¸²
+ * @brief ´Ó·şÎñÆ÷½ÓÊÕ×Ö·û´®
  * 
  * @return char* 
  */
 char* ESP8266_RecStr();
 
 /**
- * @brief espæ¥æ”¶æ¶ˆæ¯å¤„ç†
+ * @brief esp½ÓÊÕÏûÏ¢´¦Àí
  * 
  */
-void esp_parse(void);
+void esp_parse(void *arg);
 
 #ifdef __cplusplus
 }

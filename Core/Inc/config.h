@@ -18,19 +18,19 @@
 // #define ACTION_ENABLED
 #define DEBUG_DEV_INFO_USED 
 
-//使能系统
+//ʹ��ϵͳ
 #define OS_USED
-//系统功能选择
+//ϵͳ����ѡ��
 #ifdef OS_USED
-//互斥信号量
+//�����ź���
 #define MUTEX
-//队列功能
+//���й���
 #define QUEUE
-//计数信号量
+//�����ź���
 #define COUNT_SEM
 #endif
 
-//使能日志输出
+//ʹ����־���
 #define LOG
 
 #define MODULE_TYPE_ESP8266

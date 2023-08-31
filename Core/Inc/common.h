@@ -6,14 +6,15 @@ extern "C" {
 #endif
 
 #include "stm32f1xx_hal.h"
+#include "stdbool.h"
 #include "config.h"
 
 #ifdef OS_USED
 #include "cmsis_os.h"
 #endif
 
-#define 	_IN_            /* è¡¨æ˜è¿™æ˜¯ä¸€ä¸ªè¾“å…¥å‚æ•°. */
-#define		_OU_            /* è¡¨æ˜è¿™æ˜¯ä¸€ä¸ªè¾“å‡ºå‚æ•°. */
+#define 	_IN_            /* ±íÃ÷ÕâÊÇÒ»¸öÊäÈë²ÎÊı. */
+#define		_OU_            /* ±íÃ÷ÕâÊÇÒ»¸öÊä³ö²ÎÊı. */
 
 #ifdef __GNUC__
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
@@ -21,31 +22,31 @@ extern "C" {
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif
 
-//uint16_t ç±»å‹ç½®ä½ã€æ¸…é™¤
+//uint16_t ÀàĞÍÖÃÎ»¡¢Çå³ı
 #define SET_EVENT(event, arg)               ATOMIC_SETH_BIT((event), (arg))
 #define CLEAR_EVENT(event, arg)             ATOMIC_CLEARH_BIT((event), (arg))
 #define GET_EVEVT(event, arg)               ((event) & (arg))
 
 /**
- * @brief æŒ‡å®šä¸²å£è¾“å‡ºå­—ç¬¦ä¸²
+ * @brief Ö¸¶¨´®¿ÚÊä³ö×Ö·û´®
  * 
- * @param USARTx ä¸²å£
- * @param Data æ•°æ®
+ * @param USARTx ´®¿Ú
+ * @param Data Êı¾İ
  * @param ... 
  */
 void usart_printf(UART_HandleTypeDef *USARTx, const char *fmt, ...);
 
 /**
- * @brief å¾®ç§’çº§é˜»å¡å»¶è¿Ÿ
+ * @brief Î¢Ãë¼¶×èÈûÑÓ³Ù
  * 
- * @param count å»¶æ—¶è®¡æ•°
+ * @param count ÑÓÊ±¼ÆÊı
  */
 void delay_us(uint32_t count);
 
 /**
- * @brief æ¯«ç§’çº§é˜»å¡å»¶è¿Ÿ
+ * @brief ºÁÃë¼¶×èÈûÑÓ³Ù
  * 
- * @param count å»¶æ—¶è®¡æ•°
+ * @param count ÑÓÊ±¼ÆÊı
  */
 void delay_ms(uint32_t count);
 

@@ -23,21 +23,21 @@ extern "C" {
 #include <stdbool.h>
 #include <stdarg.h>
 
-// æ—¥å¿—è¾“å‡ºç­‰çº§
+// ÈÕÖ¾Êä³öµÈ¼¶
 typedef enum {
-    LOG_DEBUG,  //è°ƒè¯•
-    LOG_INFO,   //é€šçŸ¥
-    LOG_WARN,   //è­¦å‘Š
-    LOG_ERROR   //é”™è¯¯
+    LOG_DEBUG,  //µ÷ÊÔ
+    LOG_INFO,   //Í¨Öª
+    LOG_WARN,   //¾¯¸æ
+    LOG_ERROR   //´íÎó
 } LOG_LEVEL;
 
 
-// å…¨å±€æ—¥å¿—çº§åˆ«è¾“å‡ºæ ‡å¿—, åªè¾“å‡ºå°äºæˆ–ç­‰äºè¯¥ç­‰çº§çš„æ—¥å¿—ä¿¡æ¯
+// È«¾ÖÈÕÖ¾¼¶±ğÊä³ö±êÖ¾, Ö»Êä³öĞ¡ÓÚ»òµÈÓÚ¸ÃµÈ¼¶µÄÈÕÖ¾ĞÅÏ¢
 // extern LOG_LEVEL g_log_level;
 
 
 /**
- * @brief è®¾ç½®å…¨å±€æ—¥å¿—è¾“å‡ºçº§åˆ«æ ‡å¿—
+ * @brief ÉèÖÃÈ«¾ÖÈÕÖ¾Êä³ö¼¶±ğ±êÖ¾
  * 
  * @param level 
  */
@@ -45,7 +45,7 @@ void Log_Set_Level(LOG_LEVEL level);
 
 
 /**
- * @brief è·å–å½“å‰æ—¥å¿—ç­‰çº§
+ * @brief »ñÈ¡µ±Ç°ÈÕÖ¾µÈ¼¶
  * 
  * @return LOG_LEVEL 
  */
@@ -53,12 +53,12 @@ LOG_LEVEL Log_Get_Level(void);
 
 
 /**
- * @brief æ—¥å¿—æ‰“å°å‡½æ•°ï¼Œé»˜è®¤æ‰“å°åˆ°æ ‡å‡†è¾“å‡º
+ * @brief ÈÕÖ¾´òÓ¡º¯Êı£¬Ä¬ÈÏ´òÓ¡µ½±ê×¼Êä³ö
  *
- * @param file æºæ–‡ä»¶å
- * @param func å‡½æ•°å
- * @param line è¡Œå·
- * @param level æ—¥å¿—ç­‰çº§
+ * @param file Ô´ÎÄ¼şÃû
+ * @param func º¯ÊıÃû
+ * @param line ĞĞºÅ
+ * @param level ÈÕÖ¾µÈ¼¶
  */
 void Log_writter(const char *file, const char *func, const int line, const int level, const char *fmt, ...);
 

@@ -18,35 +18,35 @@ extern "C" {
 
 
 typedef enum _eResault_{
-    RET_SUCCESS   						        = 0,      // 表示成功返回
-    ERR_FAILURE   						        = -100,   // 表示失败返回
-    ERR_INVAL     						        = -101,   // 表示参数无效错误
-    ERR_NULL       						        = -102,   // 表示空指针
-    ERR_MALLOC     						        = -103,   // 表示内存申请失败
-    ERR_SEND_DATA   				            = -104,   // 表示AT串口发送失败
+    RET_SUCCESS   						        = 0,      // ��ʾ�ɹ�����
+    ERR_FAILURE   						        = -100,   // ��ʾʧ�ܷ���
+    ERR_INVAL     						        = -101,   // ��ʾ������Ч����
+    ERR_NULL       						        = -102,   // ��ʾ��ָ��
+    ERR_MALLOC     						        = -103,   // ��ʾ�ڴ�����ʧ��
+    ERR_SEND_DATA   				            = -104,   // ��ʾAT���ڷ���ʧ��
    
 
-	ERR_TIMEOUT	  						        = -201,	   //响应超时	
-	ERR_RESP_NULL  						        = -202,	   //响应数据指针无效
-	ERR_EXCEED_MAX_TOPICS 				        = -203,    //超过最多topic可订阅数
-	ERR_MQTT_NO_CONN				            = -204,    //MQTT未连接
+	ERR_TIMEOUT	  						        = -201,	   //��Ӧ��ʱ	
+	ERR_RESP_NULL  						        = -202,	   //��Ӧ����ָ����Ч
+	ERR_EXCEED_MAX_TOPICS 				        = -203,    //�������topic�ɶ�����
+	ERR_MQTT_NO_CONN				            = -204,    //MQTTδ����
 
 
-    ERR_JSON_PARSE                              = -301,    // 表示JSON解析错误
-    ERR_JSON_BUFFER_TRUNCATED                   = -302,    // 表示JSON文档会被截断
-    ERR_JSON_BUFFER_TOO_SMALL                   = -303,    // 表示存储JSON文档的缓冲区太小
-    ERR_JSON                                    = -304,    // 表示JSON文档生成错误
-    ERR_MAX_JSON_TOKEN                          = -305,    // 表示超过JSON文档中的最大Token数
-    ERR_MAX_APPENDING_REQUEST                   = -306,    // 表示超过同时最大的文档请求
-    ERR_MAX_TOPIC_LENGTH                        = -307,    // 表示超过规定最大的topic长度
+    ERR_JSON_PARSE                              = -301,    // ��ʾJSON��������
+    ERR_JSON_BUFFER_TRUNCATED                   = -302,    // ��ʾJSON�ĵ��ᱻ�ض�
+    ERR_JSON_BUFFER_TOO_SMALL                   = -303,    // ��ʾ�洢JSON�ĵ��Ļ�����̫С
+    ERR_JSON                                    = -304,    // ��ʾJSON�ĵ����ɴ���
+    ERR_MAX_JSON_TOKEN                          = -305,    // ��ʾ����JSON�ĵ��е����Token��
+    ERR_MAX_APPENDING_REQUEST                   = -306,    // ��ʾ����ͬʱ�����ĵ�����
+    ERR_MAX_TOPIC_LENGTH                        = -307,    // ��ʾ�����涨����topic����
 
 
-	ERR_PROPERTY_EXIST                          = -401,    // 表示注册的属性已经存在
-    ERR_PROPERTY_NOT_EXIST                      = -402,    // 表示注册的属性不存在
-    ERR_REPORT_TIMEOUT                          = -403,    // 表示更新设备影子文档超时
-    ERR_REPORT_REJECTED                         = -404,    // 表示更新设备影子文档被拒绝
-    ERR_GET_TIMEOUT                             = -405,    // 表示拉取设备影子文档超时
-    ERR_GET_REJECTED                            = -406,    // 表示拉取设备影子文档被拒绝
+	ERR_PROPERTY_EXIST                          = -401,    // ��ʾע��������Ѿ�����
+    ERR_PROPERTY_NOT_EXIST                      = -402,    // ��ʾע������Բ�����
+    ERR_REPORT_TIMEOUT                          = -403,    // ��ʾ�����豸Ӱ���ĵ���ʱ
+    ERR_REPORT_REJECTED                         = -404,    // ��ʾ�����豸Ӱ���ĵ����ܾ�
+    ERR_GET_TIMEOUT                             = -405,    // ��ʾ��ȡ�豸Ӱ���ĵ���ʱ
+    ERR_GET_REJECTED                            = -406,    // ��ʾ��ȡ�豸Ӱ���ĵ����ܾ�
 	ERR_ACTION_EXIST                            = -407,    // acion already exist
     ERR_ACTION_NOT_EXIST                        = -408,    // acion not exist
 } eResault;

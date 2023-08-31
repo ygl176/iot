@@ -19,16 +19,16 @@ extern "C" {
 #include <string.h>
 #include <stdarg.h>
 
-#define PRINTF_BUFFERS_LEN 		1024		//usart_printf ç¼“å†²åŒºå¤§å°
-#define PRINTF_UART				huart1		//printf é»˜è®¤ä¸²å£
+#define PRINTF_BUFFERS_LEN 		1024		//usart_printf »º³åÇø´óĞ¡
+#define PRINTF_UART				huart1		//printf Ä¬ÈÏ´®¿Ú
 
-// 72M é¢‘ç‡ï¼Œforå¾ªç¯ 5 æ¬¡çº¦ 1 us
+// 72M ÆµÂÊ£¬forÑ­»· 5 ´ÎÔ¼ 1 us
 #define DELAY_US_COUNT	5
 extern UART_HandleTypeDef PRINTF_UART;
 static uint8_t ch;
 
 #ifdef __GNUC__
-//é‡å†™è¿™ä¸ªå‡½æ•°,é‡å®šå‘printfå‡½æ•°åˆ°ä¸²å£
+//ÖØĞ´Õâ¸öº¯Êı,ÖØ¶¨Ïòprintfº¯Êıµ½´®¿Ú
 PUTCHAR_PROTOTYPE
 {
 	HAL_UART_Transmit(&PRINTF_UART, (uint8_t*)&ch, 1, 0xFFFF);
@@ -54,7 +54,7 @@ void usart_printf(UART_HandleTypeDef *USARTx, const char *fmt, ...)
 	vsnprintf(bufs, sizeof(bufs), fmt, ap);
 	va_end(ap);
 
-	HAL_UART_Transmit(USARTx, bufs, strlen(bufs), 0xffff);
+	HAL_UART_Transmit(USARTx, (uint8_t*)bufs, strlen(bufs), 0xffff);
 }
 
 
@@ -82,7 +82,7 @@ void hal_thread_create(volatile void* threadId, uint16_t stackSize, int Priority
 	  .stack_size = stackSize,
 	  .priority = (osPriority_t) Priority,
 	};
-  	threadId = osThreadNew(fn, NULL, &Task_attributes);
+  	threadId = osThreadNew(fn, arg, &Task_attributes);
 
 	(void)threadId; //Eliminate warning
 }
@@ -120,7 +120,7 @@ void HAL_MutexDestroy(_IN_ void * mutex)
 {
 	osStatus_t ret;
 	
-    if(osOK != (ret = osMutexDelete((osMutexId)mutex)))
+    if(osOK != (ret = osMutexDelete((osMutexId_t)mutex)))
     {
 		Log_e("HAL_MutexDestroy err, err:%d\n\r",ret);
 	}
@@ -130,7 +130,7 @@ void HAL_MutexLock(_IN_ void * mutex)
 {
 	osStatus_t ret;
 
-	if(osOK != (ret = osMutexWait((osMutexId)mutex, osWaitForever)))
+	if(osOK != (ret = osMutexWait((osMutexId_t)mutex, osWaitForever)))
 	{
 		Log_e("HAL_MutexLock err, err:%d\n\r",ret);
 	}
@@ -140,7 +140,7 @@ void HAL_MutexUnlock(_IN_ void * mutex)
 {
 	osStatus_t ret;
 
-	if(osOK != (ret = osMutexRelease((osMutexId)mutex)))
+	if(osOK != (ret = osMutexRelease((osMutexId_t)mutex)))
 	{
 		Log_e("HAL_MutexUnlock err, err:%d\n\r",ret);
 	}	

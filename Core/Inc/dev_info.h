@@ -20,30 +20,35 @@ extern "C" {
 #include "config.h"
 #include "stdbool.h"
 
-/* 设备ID的最大长度, 必须保持唯一 */
+/* Զ�̷�������ַ */
+#define MQTT_SERVER     "ON74ZK6IWN.iotcloud.tencentdevices.com"
+/* Զ�̷������˿� */
+#define MQTT_PORT       "1883"
+
+/* �豸ID����󳤶�, ���뱣��Ψһ */
 #define 	MAX_SIZE_OF_CLIENT_ID                                   (80)
 
-/* 产品名称的最大长度 */
+/* ��Ʒ���Ƶ���󳤶� */
 #define MAX_SIZE_OF_PRODUCT_ID                                    	(10)
 
-/* 产品密钥的最大长度 ，动态设备注册需要*/
+/* ��Ʒ��Կ����󳤶� ����̬�豸ע����Ҫ*/
 #define MAX_SIZE_OF_PRODUCT_SECRET                                  (48)
 
 
-/* 设备ID的最大长度 */
+/* �豸ID����󳤶� */
 #define MAX_SIZE_OF_DEVICE_NAME                                     (64)
 
-/* psk最大长度 */
+/* psk��󳤶� */
 #define MAX_SIZE_OF_DEVICE_SERC  	 								(24)
 
 
-/* 设备证书文件名的最大长度 */
+/* �豸֤���ļ�������󳤶� */
 #define MAX_SIZE_OF_DEVICE_CERT_FILE_NAME                           (128)
 
-/* 设备私钥文件名的最大长度 */
+/* �豸˽Կ�ļ�������󳤶� */
 #define MAX_SIZE_OF_DEVICE_KEY_FILE_NAME                            (128)
 
-/* 云端保留主题的最大长度 */
+/* �ƶ˱����������󳤶� */
 #define MAX_SIZE_OF_CLOUD_TOPIC            ((MAX_SIZE_OF_DEVICE_NAME) + (MAX_SIZE_OF_PRODUCT_ID) + 64)
 
 

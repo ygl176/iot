@@ -23,6 +23,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ringbuff.h"
+#include "bsp_at_esp8266.h"
+#include "common.h"
+#include "cmsis_os.h"
 #include "log.h"
 /* USER CODE END Includes */
 
@@ -248,11 +251,25 @@ void USART1_IRQHandler(void)
   if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
   {
       ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
+  }
+  else if(__HAL_UART_GET_FLAG(&huart1, USART_SR_IDLE))
+  {
+	  ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
+	  ch = '\0';
+  }
+  else
+  {
+	  ch = '\0';
+  }
 
-      if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, &ch, 1))
-      {
-          Log_e("ring buff push err");
-      }
+  if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, &ch, 1))
+  {
+	  Log_e("ring buff push err");
+  }
+  else
+  {
+	  tbsp_esp8266 p_esp = dev_esp_get();
+	  HAL_SemaphoreRelease(p_esp->sema_rx);
   }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);

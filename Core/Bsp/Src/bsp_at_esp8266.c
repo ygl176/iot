@@ -10,20 +10,24 @@
  */
 
 #include <string.h>
+#include "dev_info.h"
 #include "bsp_at_esp8266.h"
 #include "common.h"
 #include "log.h"
 
 extern UART_HandleTypeDef huart1;
+
 #define ESP_UART    (&huart1)
-#define AT_WAIT_MS  1000
+#define AT_WAIT_MS  5000
+#define WIFI_ID			"Redmi K40"
+#define WIFI_PASS		"qweasd4848"
 
 sRingbuff esp_ring_buff;
 static bsp_esp8266 esp;
 
 
 
-//Êé•Êî∂Ê∂àÊÅØÈòüÂàóÈïøÂ∫¶
+//Ω” ’œ˚œ¢∂”¡–≥§∂»
 // #define RECV_QUEUE_LEN      4
 #define AT_RESP_END_OK                 "OK"
 #define AT_RESP_END_ERROR              "ERROR"
@@ -87,7 +91,7 @@ bool dev_esp_init(tbsp_esp8266 p_esp)
         Log_e("malloc ringbuff err");
         return false;
     }
-    p_esp->p_ring_buff = ring_buff;
+    ring_buff_init(&esp_ring_buff, ring_buff, RING_BUFF_LEN);
 
     p_esp->sema_rx = HAL_SemaphoreCreate(RING_BUFF_LEN, 0);
     if(p_esp->sema_rx == NULL)
@@ -102,13 +106,17 @@ bool dev_esp_init(tbsp_esp8266 p_esp)
         Log_e("esp create recv err");
         return false;
     }
-    p_esp->recv_len = AT_CMD_MAX_LEN;
 
     if(p_esp->resp)
     {
         resp_release(p_esp->resp);
         p_esp->resp = NULL;
     }
+
+    p_esp->p_ring_buff = &esp_ring_buff;
+    p_esp->recv_len = AT_CMD_MAX_LEN;
+    p_esp->cur_recv_len = 0;
+    p_esp->resp = NULL;
     p_esp->resp_notice = false;
 
     return true;
@@ -124,35 +132,68 @@ bool ESP8266_Init()
     {
         Log_e("esp is INITIALIZED");
     }
-    else
 
-    dev_esp_init(p_esp);
+    if(!dev_esp_init(p_esp))
+    {
+        Log_e("p_esp init failed");
+        return false;
+    }
 
-    
+    osThreadId_t esp_parse_id = NULL;
+
+    hal_thread_create(esp_parse_id, 1024, osPriorityNormal, esp_parse, p_esp);
+
+    if(!ESP8266_AT_Test())
+    {
+        return false;
+    }
+
+    if(!ESP8266_ATE(0))
+    {
+        return false;
+    }
+
+    if(!ESP8266_Mode_Set(STA))
+    {
+        return false;
+    }
+
+    if(!ESP8266_JoinAP(WIFI_ID, WIFI_PASS))
+    {
+        return false;
+    }
+
+    if(!ESP8266_Link_Server("TCP", MQTT_SERVER, MQTT_PORT, Single_ID_0))
+    {
+        return false;
+    }
+
+    if(!ESP8266_UnvarnishSend())
+    {
+        return false;
+    }
 
     p_esp->status = ESP8266_INITIALIZED;
+
+    return true;
 }
 
 void ESP8266_Rst()
 {
     response_t resp = resp_malloc(ESP_BUFF_LEN);
-    bool ret = true;
 
     if(resp == NULL)
     {
         Log_e("at test failed: malloc resp");
-        return false;
+        return ;
     }
 
     if(!ESP8266_Cmd(resp, AT_WAIT_MS, "AT+RST\r\n"))
     {
         Log_e("at reset failed");
-        ret = false;
     }
 
     resp_release(resp);
-
-    return ret;
 }
 
 bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...)
@@ -177,9 +218,9 @@ bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...)
     HAL_MutexLock(p_esp->lock);
 
     p_esp->resp = resp;
-    p_esp->resp_notice = true;
+    p_esp->resp_notice = false;
 
-    //ÂèëÈÄÅÂëΩ‰ª§
+    //∑¢ÀÕ√¸¡Ó
     HAL_UART_Transmit(ESP_UART, (uint8_t*)cmd, count, HAL_MAX_DELAY);
 
     while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)
@@ -187,7 +228,7 @@ bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...)
         // HAL_Delay(10);
     }
 
-    if(HAL_GetTick() > target_time) //Ë∂ÖÊó∂
+    if(HAL_GetTick() > target_time) //≥¨ ±
     {
         Log_e("esp cmd(%s) timeout %dms", cmd, wait_ms);
 
@@ -197,7 +238,7 @@ bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...)
 
     if(p_esp->resp_notice)
     {
-        if(!p_esp->resp_status) //ÁªìÊûúÈîôËØØ
+        if(!p_esp->resp_status) //Ω·π˚¥ÌŒÛ
         {
             Log_e("esp cmd(%s) failed", cmd);
             ret = false;
@@ -207,7 +248,9 @@ bool ESP8266_Cmd(response_t resp, uint32_t wait_ms, const char *fmt, ...)
     p_esp->resp = NULL;
     p_esp->resp_notice = false;
 
-    HAL_MutexLock(p_esp->lock);
+    HAL_Free(cmd);
+
+    HAL_MutexUnlock(p_esp->lock);
 
     return ret;
 }
@@ -513,7 +556,7 @@ void ESP8266_ExitUnvarnishSend()
 {
     delay_ms(1000);
 
-    HAL_UART_Transmit(ESP_UART, "+++", 3, HAL_MAX_DELAY);
+    HAL_UART_Transmit(ESP_UART, (uint8_t*)"+++", 3, HAL_MAX_DELAY);
 
     delay_ms(500);
 }
@@ -532,7 +575,7 @@ bool ESP8266_SendStr(char *pStr, uint32_t StrLen, eID_NO Id)
 
     if(p_esp->status == ESP8266_INITIALIZED)
     {
-        HAL_UART_Transmit(ESP_UART, pStr, StrLen, HAL_MAX_DELAY);
+        HAL_UART_Transmit(ESP_UART, (uint8_t*)pStr, StrLen, HAL_MAX_DELAY);
     }
     else if(Id < 5)
     {
@@ -577,7 +620,7 @@ char* ESP8266_RecStr();
 static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
 {
     uint32_t read_len = 0;
-    char ch = 0;
+    uint8_t ch = 0;
     bool is_full = false;
     memset(p_esp->recv, 0x00, p_esp->recv_len);
     p_esp->cur_recv_len = 0;
@@ -615,7 +658,7 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
     }
 }
 
-void esp_parse(void)
+void esp_parse(void *arg)
 {
     tbsp_esp8266 p_esp = dev_esp_get();
 
@@ -628,9 +671,9 @@ void esp_parse(void)
 #ifdef PRINT_CMD
 
 #endif
-            if(p_esp->status == ESP8266_INITIALIZED)    //Â∑≤ËøûÊé•ÊúçÂä°Âô®ÔºåÂºÄÂêØÈÄè‰º†
+            if(p_esp->status == ESP8266_INITIALIZED)    //“—¡¨Ω”∑˛ŒÒ∆˜£¨ø™∆ÙÕ∏¥´
             {
-                //ÂæÖÊõøÊç¢Èùû‰∏ªÂä®ËØ∑Ê±ÇÊ£ÄÊµã
+                //¥˝ÃÊªª∑«÷˜∂Ø«Î«ÛºÏ≤‚
                 if(false)
                 {
                     
@@ -644,7 +687,7 @@ void esp_parse(void)
                 
                 }
             }
-            else    //ESP ËøòÊú™ÂàùÂßãÂåñ
+            else    //ESP ªπŒ¥≥ı ºªØ
             {
                 if(p_esp->resp != NULL)
                 {
@@ -668,7 +711,7 @@ void esp_parse(void)
             }
 
         }
-        else    //Ëé∑ÂèñÊ∂àÊÅØÂ§±Ë¥•
+        else    //ªÒ»°œ˚œ¢ ß∞‹
         {
 
         }

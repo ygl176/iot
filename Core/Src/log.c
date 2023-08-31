@@ -18,15 +18,15 @@ extern "C" {
 #include "common.h"
 #include <string.h>
 
-//æ—¥å¿—è¾“å‡ºä¸²å£
+//ÈÕÖ¾Êä³ö´®¿Ú
 #define LOG_UART        huart2
-//æ—¥å¿—è¾“å‡ºç¼“å†²åŒºé•¿åº¦
+//ÈÕÖ¾Êä³ö»º³åÇø³¤¶È
 #define LOG_BUF_LEN     1024
 
-//é«˜äº g_log_level çš„æ—¥å¿—æ‰å¯ä»¥è¾“å‡º
+//¸ßÓÚ g_log_level µÄÈÕÖ¾²Å¿ÉÒÔÊä³ö
 static LOG_LEVEL g_log_level = LOG_DEBUG;
 static bool log_lock = false;
-
+static char bufs[LOG_BUF_LEN];
 
 
 static char *level_str[] = {
@@ -77,18 +77,17 @@ void Log_writter(const char *file, const char *func, const int line, const int l
     usart_printf(&LOG_UART,"%s|%s|%s(%d): ", level_str[level], file_name, func, line);
 
     va_list ap;
-	char bufs[LOG_BUF_LEN];
     uint32_t count = 0;
 
 	va_start(ap, fmt);
 	count = vsnprintf(bufs, sizeof(bufs), fmt, ap);
 	va_end(ap);
 
-    HAL_UART_Transmit(&LOG_UART, bufs, count, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&LOG_UART, (uint8_t*)bufs, count, HAL_MAX_DELAY);
 
-    HAL_UART_Transmit(&LOG_UART, "\r\n", 2, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&LOG_UART, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
 
-    /** printfä¸²å£è¾“å‡ºæ—¥å¿— **/
+    /** printf´®¿ÚÊä³öÈÕÖ¾ **/
     // printf("%s|%s|%s(%d): ", level_str[level], file_name, func, line);
 
     // va_list ap;
