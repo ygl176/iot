@@ -9,14 +9,17 @@
  * 
  */
 
+#include "log.h"
 #include "mqtt.h"
 #include <string.h>
+#include "common.h"
 #include "transport.h"
 #include "MQTTConnect.h"
 #include "MQTTFormat.h"
 #include "MQTTPacket.h"
 #include "MQTTPublish.h"
 #include "MQTTSubscribe.h"
+#include "bsp_at_esp8266.h"
 #include "MQTTUnsubscribe.h"
 
 
@@ -26,16 +29,25 @@
 // const uint8_t mqtt_server[] = MQTT_SERVER;
 // const uint8_t sub_topic[] = SUB_TOPIC;
 // const uint8_t pub_topic[] = PUB_TOPIC;
-uint8_t mqtt_buff[MQTT_MAX_BUFF];
 
 bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key, uint16_t keep_alive)
 {
+    bool ret = true;
+
     MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
     data.clientID.cstring = client_id;
     data.keepAliveInterval = keep_alive;
     data.cleansession = 1;
     data.username.cstring = DEVICE_NAME;
     data.password.cstring = DEVICE_KEY;
+
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
 
     uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);
 
@@ -49,13 +61,14 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
 
         if(MQTTDeserialize_connack(&sessionPresent, &connack_rc, mqtt_buff, MQTT_MAX_BUFF) != 1 || connack_rc != 0)
         {
-            return false;
+            ret = false;
         }
     }
     else
-        return false;
+        ret = false;
 
-    return true;
+    HAL_Free(mqtt_buff);
+    return ret;
 }
 
 
@@ -65,11 +78,19 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
  */
 void mqtt_disconnect()
 {
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
+
     uint16_t len = MQTTSerialize_disconnect(mqtt_buff, MQTT_MAX_BUFF);
 
     transport_sendPacketBuffer(mqtt_buff, len);
 
-    memset(mqtt_buff, 0, MQTT_MAX_BUFF);
+    HAL_Free(mqtt_buff);
 }
 
 /**
@@ -83,6 +104,15 @@ void mqtt_disconnect()
  */
 bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
 {
+    bool ret = true;
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
+
     MQTTString topicName = MQTTString_initializer;
 
     topicName.cstring = sub_topic;
@@ -101,17 +131,28 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
 
         uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, mqtt_buff, MQTT_MAX_BUFF);
 
-        if(!rc || subid != msgid || qos == 0x80) return false;
+        if(!rc || subid != msgid || qos == 0x80)
+            ret = false;
     }
-    else return false;
+    else
+        ret = false;
 
-    return true;
+    HAL_Free(mqtt_buff);
+    return ret;
 }
 
 
 bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 {
+    bool ret = true;
     MQTTString topicName = MQTTString_initializer;
+
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
 
     uint16_t len = MQTTSerialize_unsubscribe(mqtt_buff, MQTT_MAX_BUFF, 0, msgid, 1, &topicName);
 
@@ -125,11 +166,14 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 
         uint8_t rc = MQTTDeserialize_unsuback(&unsub_id, mqtt_buff, MQTT_MAX_BUFF);
 
-        if(!rc || unsub_id != msgid) return false;
+        if(!rc || unsub_id != msgid)
+            ret = false;
     }
-    else return false;
+    else 
+        ret = false;
 
-    return true;
+    HAL_Free(mqtt_buff);
+    return ret;
 }
 
 
@@ -143,14 +187,20 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 {
     MQTTString topicName = MQTTString_initializer;
 
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
+
     topicName.cstring = pub_topic;
 
     uint16_t len = MQTTSerialize_publish(mqtt_buff, MQTT_MAX_BUFF, 0 ,0 , 0, 0, topicName, payload, strlen(payload));
 
     transport_sendPacketBuffer(mqtt_buff, len);
 
-    memset(mqtt_buff, 0, MQTT_MAX_BUFF);
-
+    HAL_Free(mqtt_buff);
     return true;
 }
 
@@ -164,6 +214,15 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
  */
 bool mqtt_ping()
 {
+    bool ret = true;
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+
+    if(mqtt_buff == NULL)
+    {
+        Log_e("mqtt connect buf malloc failed");
+        return false;
+    }
+
     uint16_t len = MQTTSerialize_pingreq(mqtt_buff, MQTT_MAX_BUFF);
 
     transport_sendPacketBuffer(mqtt_buff, len);
@@ -172,8 +231,9 @@ bool mqtt_ping()
 
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) != PINGRESP)
     {
-        return false;
+        ret = false;
     }
 
-    return true;
+    HAL_Free(mqtt_buff);
+    return ret;
 }

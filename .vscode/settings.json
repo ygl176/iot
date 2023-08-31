@@ -28,6 +28,7 @@
         "common.h": "c",
         "stdarg.h": "c",
         "log.h": "c",
-        "bsp_at_esp8266.h": "c"
+        "bsp_at_esp8266.h": "c",
+        "algorithm": "c"
     }
 }

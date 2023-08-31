@@ -14,10 +14,12 @@
  *    Ian Craggs - initial API and implementation and/or initial documentation
  *    Sergio R. Caprile - "commonalization" from prior samples and/or documentation extension
  *******************************************************************************/
+#include "log.h"
 #include "transport.h"
 #include "cmsis_os.h"
 #include "usart.h"
 #include <string.h>
+#include "bsp_at_esp8266.h"
 
 
 /**
@@ -29,11 +31,18 @@ to know the caller or other indicator (the socket id): int (*getfn)(unsigned cha
 */
 
 
-HAL_StatusTypeDef transport_sendPacketBuffer(unsigned char* buf, int buflen)
+bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp, uint32_t wait_ms)
 {
-	HAL_StatusTypeDef rc = 0;
-	rc = HAL_UART_Transmit(MQTT_USART, (uint8_t*)buf, buflen, 0xffff);
-	return rc;
+	uint32_t target = HAL_GetTick() + wait_ms;
+
+	if(HAL_UART_Transmit(MQTT_USART, (uint8_t*)buf, buflen, HAL_MAX_DELAY) != HAL_OK)
+	{
+		Log_e("mqtt cmd send failed");
+		return false;
+	}
+
+		
+	
 }
 
 
