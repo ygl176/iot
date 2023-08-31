@@ -118,6 +118,7 @@ bool dev_esp_init(tbsp_esp8266 p_esp)
     p_esp->cur_recv_len = 0;
     p_esp->resp = NULL;
     p_esp->resp_notice = false;
+    p_esp->recv_notice = false;
 
     return true;
 }
@@ -643,8 +644,9 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
             is_full = true;
         }
 
-        if(ch == '\0')
+        if(p_esp->recv_notice && ch == '\0')
         {
+            p_esp->recv_notice = false;
             if(is_full)
             {
                 Log_e("read message failed. data out of buffer size(%d)", p_esp->recv_len);
@@ -678,7 +680,7 @@ void esp_parse(void *arg)
                 {
                     
                 }
-                else if(p_esp->resp != NULL)
+                else if(p_esp->resp != NULL) //mqttÖ÷¶¯ÇëÇó
                 {
 
                 }

@@ -247,6 +247,7 @@ void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
   uint8_t ch;
+  tbsp_esp8266 p_esp = dev_esp_get();
 
   if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
   {
@@ -256,6 +257,7 @@ void USART1_IRQHandler(void)
   {
 	  ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
 	  ch = '\0';
+	  p_esp->recv_notice = true;
   }
   else
   {
@@ -264,12 +266,11 @@ void USART1_IRQHandler(void)
 
   if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, &ch, 1))
   {
-	  Log_e("ring buff push err");
+	    Log_e("ring buff push err");
   }
   else
   {
-	  tbsp_esp8266 p_esp = dev_esp_get();
-	  HAL_SemaphoreRelease(p_esp->sema_rx);
+	    HAL_SemaphoreRelease(p_esp->sema_rx);
   }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
