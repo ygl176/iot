@@ -644,7 +644,7 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
             is_full = true;
         }
 
-        if(p_esp->recv_notice && ch == '\0')
+        if(p_esp->recv_notice && osSemaphoreGetCount(p_esp->sema_rx) == 0)
         {
             p_esp->recv_notice = false;
             if(is_full)
