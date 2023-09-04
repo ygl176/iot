@@ -13,13 +13,11 @@
 #define __TRANSPORT_H
 
 #include "main.h"
+#include "bsp_at_esp8266.h"
 
 #define MQTT_USART      &huart1
 
-extern __IO uint8_t MQTT_RX_FLAG;
-extern uint8_t MQTT_RX_BUF[512];
-extern __IO uint16_t MQTT_RX_COUNT;
-
+response_t mqtt_get_resp();
 /**
  * @brief mqtt报文发送函数
  * 

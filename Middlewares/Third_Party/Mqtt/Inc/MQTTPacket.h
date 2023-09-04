@@ -40,12 +40,14 @@ enum errors
 	MQTTPACKET_READ_COMPLETE
 };
 
-enum msgTypes
+typedef enum msgTypes
 {
 	CONNECT = 1, CONNACK, PUBLISH, PUBACK, PUBREC, PUBREL,
 	PUBCOMP, SUBSCRIBE, SUBACK, UNSUBSCRIBE, UNSUBACK,
 	PINGREQ, PINGRESP, DISCONNECT
-};
+}mqtt_msg_type;
+
+
 
 /**
  * Bitfields for the MQTT header byte.

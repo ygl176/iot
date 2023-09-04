@@ -676,17 +676,20 @@ void esp_parse(void *arg)
             if(p_esp->status == ESP8266_INITIALIZED)    //已连接服务器，开启透传
             {
                 //待替换非主动请求检测
-                if(false)
+                if(((p_esp->recv[0] & 0xff00) >> 4) == 3)//接收报文为publish
                 {
                     
                 }
                 else if(p_esp->resp != NULL) //mqtt主动请求
                 {
+                    if(((p_esp->recv[0] & 0xff00) >> 4) != p_esp->mqtt_req_type)
+                    {
+                        continue;
+                    }
 
-                }
-                else
-                {
-                
+                    memcpy(p_esp->resp->buf, p_esp->recv, p_esp->cur_recv_len);
+                    p_esp->resp->buf_num = p_esp->cur_recv_len;
+                    p_esp->resp_notice = true;
                 }
             }
             else    //ESP 还未初始化

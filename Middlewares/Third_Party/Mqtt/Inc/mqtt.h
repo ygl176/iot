@@ -25,7 +25,9 @@
 #define SUB_TOPIC       "$thing/down/property/PM62I41E39/ESP8266"
 #define PUB_TOPIC       "$thing/up/property/PM62I41E39/ESP8266"
 
-#define MQTT_MAX_BUFF   512
+#define MQTT_MAX_BUFF       512
+
+#define MQTT_WAIT_TIME_MS   5000
 
 bool mqtt_init();
 bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key, uint16_t keep_alive);

@@ -83,9 +83,9 @@ typedef enum
 
 typedef struct
 {
+    uint16_t buf_size;  //缓冲区
+    uint16_t buf_num;   //接收字符数量
     char* buf;
-    uint16_t buf_size;
-
 }response;
 
 typedef response *response_t;
@@ -106,6 +106,7 @@ typedef struct
 
     bool resp_notice;           //接收到消息
     bool resp_status;           //响应结果
+    uint8_t mqtt_req_type;      //mqtt主动请求报文类型
     response_t resp;            //主动请求响应结果，同一时间只能有一个主动请求
 
     // ParserFunc parse;

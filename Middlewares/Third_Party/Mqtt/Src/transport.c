@@ -19,7 +19,7 @@
 #include "cmsis_os.h"
 #include "usart.h"
 #include <string.h>
-#include "bsp_at_esp8266.h"
+#include "common.h"
 
 
 /**
@@ -29,11 +29,21 @@ On other scenarios, the user must solve this by taking into account that the cur
 MQTTPacket_read() has a function pointer for a function call to get the data to a buffer, but no provisions
 to know the caller or other indicator (the socket id): int (*getfn)(unsigned char*, int)
 */
+static response mqtt_resp;
 
+response_t mqtt_get_resp()
+{
+	return &mqtt_resp;
+}
 
 bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp, uint32_t wait_ms)
 {
-	uint32_t target = HAL_GetTick() + wait_ms;
+	bool ret = true;
+	uint32_t target_time = HAL_GetTick() + wait_ms;
+	tbsp_esp8266 p_esp = dev_esp_get();
+
+	p_esp->resp = resp;
+	p_esp->resp_notice = false;
 
 	if(HAL_UART_Transmit(MQTT_USART, (uint8_t*)buf, buflen, HAL_MAX_DELAY) != HAL_OK)
 	{
@@ -41,36 +51,49 @@ bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp,
 		return false;
 	}
 
-		
-	
+	if(wait_ms == 0) return true;	//不需要响应报文
+
+    while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)
+    {
+        // HAL_Delay(10);
+    }
+
+    if(HAL_GetTick() > target_time) //超时
+    {
+        Log_e("esp cmd(%s) timeout %dms", buf, wait_ms);
+
+        p_esp->resp_status = false;
+        ret = false;
+    }
+
+	p_esp->resp = NULL;
+	p_esp->resp_notice = false;
+
+	return ret;
 }
 
 
 int transport_getdata(unsigned char* buf, int count)
 {
-	if(count > MQTT_RX_COUNT)
+	response_t resp = mqtt_get_resp();
+	
+	if(count > resp->buf_num)
 		return 0;
 
 	uint16_t delay_cnt = 0;
 	static uint16_t read_count = 0;
 
-	while(delay_cnt++ < 10 && MQTT_RX_FLAG == 0)
-		osDelay(100);
-	if(delay_cnt > 9)	return -1;
-
-	memcpy(buf, MQTT_RX_BUF + read_count, count);
+	memcpy(buf, resp->buf + read_count, count);
 
 	read_count += count;
 
-	if(read_count >= MQTT_RX_COUNT)
+	if(read_count >= resp->buf_num)
 	{
-		MQTT_RX_COUNT = 0;
-		MQTT_RX_FLAG = 0;
+		resp->buf_num = 0;
 		read_count = 0;
 	}
 
 	return count;
-
 }
 
 int transport_getdatanb(void *sck, unsigned char* buf, int count)

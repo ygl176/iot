@@ -33,6 +33,8 @@
 bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key, uint16_t keep_alive)
 {
     bool ret = true;
+    tbsp_esp8266 p_esp = dev_esp_get();
+    response_t resp = mqtt_get_resp();
 
     MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
     data.clientID.cstring = client_id;
@@ -41,21 +43,39 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
     data.username.cstring = DEVICE_NAME;
     data.password.cstring = DEVICE_KEY;
 
-    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
+    uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);     
 
     if(mqtt_buff == NULL)
     {
-        Log_e("mqtt connect buf malloc failed");
+        Log_e("mqtt connect buf malloc failed");        //发送命令缓冲区申请
         return false;
     }
 
-    uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);
+    HAL_MutexLock(p_esp->lock); //主动请求锁，修改请求相关信息
 
-    transport_sendPacketBuffer(mqtt_buff, len);
+    resp->buf = malloc(AT_BUFF_LEN);        //mqtt 接收缓冲区申请
+
+    if(resp->buf == NULL)
+    {
+        Log_e("mqtt connect resp buf malloc failed");
+        ret = false;
+        goto EXIT;
+    }
+    resp->buf_size = AT_BUFF_LEN;
+    p_esp->mqtt_req_type = CONNACK;     //设置等待报文类型
+
+    uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);      //初始化报文
+
+    if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_WAIT_TIME_MS))    //发送报文并等待响应
+    {
+        Log_e("connect msg send failed");
+        ret = false;
+        goto EXIT;
+    }
 
     memset(mqtt_buff, 0, MQTT_MAX_BUFF);
 
-    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == CONNACK)
+    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == CONNACK)     //解析响应报文
     {
         uint8_t sessionPresent,connack_rc;
 
@@ -67,7 +87,15 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
     else
         ret = false;
 
-    HAL_Free(mqtt_buff);
+    EXIT: //程序错误退出
+
+    HAL_Free(mqtt_buff);    //释放资源
+    HAL_Free(resp->buf);
+
+    resp->buf = NULL;
+    p_esp->mqtt_req_type = 0;
+    HAL_MutexUnlock(p_esp->lock);
+
     return ret;
 }
 
@@ -88,7 +116,11 @@ void mqtt_disconnect()
 
     uint16_t len = MQTTSerialize_disconnect(mqtt_buff, MQTT_MAX_BUFF);
 
-    transport_sendPacketBuffer(mqtt_buff, len);
+    if(!transport_sendPacketBuffer(mqtt_buff, len, NULL, 0))    //无需响应报文
+    {
+        Log_e("disconnect msg send failed");
+        return;
+    }
 
     HAL_Free(mqtt_buff);
 }
