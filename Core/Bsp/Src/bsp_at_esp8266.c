@@ -692,7 +692,7 @@ void esp_parse(void *arg)
                     p_esp->resp_notice = true;
                 }
             }
-            else    //ESP 还未初始化
+            else    //ESP 还未初始化,分析AT指令响应
             {
                 if(p_esp->resp != NULL)
                 {

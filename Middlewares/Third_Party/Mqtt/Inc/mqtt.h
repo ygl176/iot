@@ -29,6 +29,8 @@
 
 #define MQTT_WAIT_TIME_MS   5000
 
+
+
 bool mqtt_init();
 bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key, uint16_t keep_alive);
 void mqtt_disconnect();

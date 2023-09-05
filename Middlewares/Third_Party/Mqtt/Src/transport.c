@@ -51,14 +51,14 @@ bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp,
 		return false;
 	}
 
-	if(wait_ms == 0) return true;	//ä¸éœ€è¦å“åº”æŠ¥æ–‡
+	if(wait_ms == 0) return true;	//²»ÐèÒªÏìÓ¦±¨ÎÄ
 
     while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)
     {
         // HAL_Delay(10);
     }
 
-    if(HAL_GetTick() > target_time) //è¶…æ—¶
+    if(HAL_GetTick() > target_time) //³¬Ê±
     {
         Log_e("esp cmd(%s) timeout %dms", buf, wait_ms);
 
