@@ -51,9 +51,9 @@ bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp,
 		return false;
 	}
 
-	if(wait_ms == 0) return true;	//不需要响应报文
+	if(wait_ms == 0 && resp == NULL) return true;	//不需要响应报文
 
-    while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)
+    while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)	//物理层协议不要等待，而是加入消息链表
     {
         // HAL_Delay(10);
     }

@@ -45,6 +45,7 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
         Log_e("mqtt connect buf malloc failed");
         return false;
     }
+    uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);      //初始化报文
 
     HAL_MutexLock(p_esp->lock); //主动请求锁，修改请求相关信息
 
@@ -58,8 +59,6 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
     }
     resp->buf_size = AT_BUFF_LEN;
     p_esp->mqtt_req_type = CONNACK;     //设置等待报文类型
-
-    uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);      //初始化报文
 
     if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_WAIT_TIME_MS))    //发送报文并等待响应
     {
@@ -149,6 +148,12 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
         return false;
     }
 
+    MQTTString topicName = MQTTString_initializer;
+    topicName.cstring = sub_topic;
+    uint16_t len = MQTTSerialize_subscribe(mqtt_buff, MQTT_MAX_BUFF, 0, msgid, 1, &topicName, &req_qos);
+
+    HAL_MutexLock(p_esp->lock);
+
     resp->buf = HAL_Malloc(AT_BUFF_LEN);
     if(resp->buf == NULL)
     {
@@ -156,12 +161,6 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
         ret = false;
         goto EXIT;
     }
-
-    MQTTString topicName = MQTTString_initializer;
-    topicName.cstring = sub_topic;
-    uint16_t len = MQTTSerialize_subscribe(mqtt_buff, MQTT_MAX_BUFF, 0, msgid, 1, &topicName, &req_qos);
-
-    HAL_MutexLock(p_esp->lock);
 
     p_esp->mqtt_req_type = SUBACK;
 
@@ -216,6 +215,10 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
         return false;
     }
 
+    uint16_t len = MQTTSerialize_unsubscribe(mqtt_buff, MQTT_MAX_BUFF, 0, msgid, 1, &topicName);
+
+    HAL_MutexLock(p_esp->lock);
+
     resp->buf = HAL_Malloc(AT_BUFF_LEN);
     if(resp->buf == NULL)
     {
@@ -223,10 +226,6 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
         ret = false;
         goto EXIT;
     }
-
-    uint16_t len = MQTTSerialize_unsubscribe(mqtt_buff, MQTT_MAX_BUFF, 0, msgid, 1, &topicName);
-
-    HAL_MutexLock(p_esp->lock);
 
     p_esp->mqtt_req_type = UNSUBACK;
 
@@ -292,7 +291,6 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
     // }
 
     topicName.cstring = pub_topic;
-
     uint16_t len = MQTTSerialize_publish(mqtt_buff, MQTT_MAX_BUFF, 0 ,0 , 0, 0, topicName, payload, strlen(payload));
 
     HAL_MutexLock(p_esp->lock);
@@ -309,7 +307,7 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 
     HAL_MutexUnlock(p_esp->lock);
 
-    HAL_Free(resp->buf);
+    // HAL_Free(resp->buf);
     HAL_Free(mqtt_buff);
     resp->buf = NULL;
     p_esp->mqtt_req_type = 0;
@@ -337,7 +335,10 @@ bool mqtt_ping()
         Log_e("mqtt sub buf malloc failed");
         return false;
     }
+    uint16_t len = MQTTSerialize_pingreq(mqtt_buff, MQTT_MAX_BUFF);
 
+    HAL_MutexLock(p_esp->lock);
+    
     resp->buf = HAL_Malloc(AT_BUFF_LEN);
     if(resp->buf == NULL)
     {
@@ -345,10 +346,6 @@ bool mqtt_ping()
         ret = false;
         goto EXIT;
     }
-
-    uint16_t len = MQTTSerialize_pingreq(mqtt_buff, MQTT_MAX_BUFF);
-
-    HAL_MutexLock(p_esp->lock);
 
     p_esp->mqtt_req_type = PINGRESP;
 
