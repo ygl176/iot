@@ -29,21 +29,21 @@ On other scenarios, the user must solve this by taking into account that the cur
 MQTTPacket_read() has a function pointer for a function call to get the data to a buffer, but no provisions
 to know the caller or other indicator (the socket id): int (*getfn)(unsigned char*, int)
 */
-static response mqtt_resp;
+static response mqtt_resp; //mqtt协议接收缓冲区
 
 response_t mqtt_get_resp()
 {
 	return &mqtt_resp;
 }
 
-bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp, uint32_t wait_ms)
+bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp)
 {
 	bool ret = true;
-	uint32_t target_time = HAL_GetTick() + wait_ms;
 	tbsp_esp8266 p_esp = dev_esp_get();
 
+	HAL_MutexLock(p_esp->lock);
+
 	p_esp->resp = resp;
-	p_esp->resp_notice = false;
 
 	if(HAL_UART_Transmit(MQTT_USART, (uint8_t*)buf, buflen, HAL_MAX_DELAY) != HAL_OK)
 	{
@@ -51,23 +51,9 @@ bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp,
 		return false;
 	}
 
-	if(wait_ms == 0 && resp == NULL) return true;	//不需要响应报文
-
-    while(p_esp->resp_notice != true && HAL_GetTick() <= target_time)	//物理层协议不要等待，而是加入消息链表
-    {
-        // HAL_Delay(10);
-    }
-
-    if(HAL_GetTick() > target_time) //超时
-    {
-        Log_e("esp cmd(%s) timeout %dms", buf, wait_ms);
-
-        p_esp->resp_status = false;
-        ret = false;
-    }
-
 	p_esp->resp = NULL;
-	p_esp->resp_notice = false;
+
+	HAL_MutexUnlock(p_esp->lock);
 
 	return ret;
 }
@@ -80,7 +66,6 @@ int transport_getdata(unsigned char* buf, int count)
 	if(count > resp->buf_num)
 		return 0;
 
-	uint16_t delay_cnt = 0;
 	static uint16_t read_count = 0;
 
 	memcpy(buf, resp->buf + read_count, count);

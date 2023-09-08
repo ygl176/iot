@@ -69,7 +69,7 @@ typedef enum
 {
     GET_FAIL = 0,       //获取状态失败
     GOT_IP = 2,         //获得IP
-    CONNECT,            //建立连接
+    AP_CONNECT,            //建立连接
     N_CONNECT,          //失去连接
 }eAP_Link_Sta;
 
@@ -106,7 +106,6 @@ typedef struct
 
     bool resp_notice;           //接收到消息
     bool resp_status;           //响应结果
-    uint8_t mqtt_req_type;      //mqtt主动请求报文类型
     response_t resp;            //主动请求响应结果，同一时间只能有一个主动请求
 
     // ParserFunc parse;
