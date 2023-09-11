@@ -26,7 +26,7 @@ response_t mqtt_get_resp();
  * @param resp 返回消息
  * @return bool 
  */
-bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp);
+bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp, uint16_t wait_flag, uint32_t wait_time);
 int transport_getdata(unsigned char* buf, int count);
 int transport_getdatanb(void *sck, unsigned char* buf, int count);
 int transport_open(char* host, int port);

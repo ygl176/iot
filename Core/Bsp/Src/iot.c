@@ -102,14 +102,14 @@ void handle_timeout_repaly(iot_client_type *client)
 }
 
 
-bool iot_send_request(iot_client_type *client)
-{
-    
-}
-
-
-bool iot_sub_down_topic(iot_client_type* client)
-{
-
-}
+//bool iot_send_request(iot_client_type *client)
+//{
+//
+//}
+//
+//
+//bool iot_sub_down_topic(iot_client_type* client)
+//{
+//
+//}
 

@@ -16,15 +16,15 @@
 #include <stdbool.h>
 #include "bsp_at_esp8266.h"
 
-#define CLIENT_ID       (char*)"PM62I41E39ESP8266"
-#define DEVICE_NAME     (char*)"PM62I41E39ESP8266;12010126;DXLQO;1692090392"
-#define DEVICE_KEY      (char*)"9889a494cb5556eb869a2c6b4573a5cd31461dd1a099e217f450973afb82c60b;hmacsha256"
+#define CLIENT_ID       (char*)"VOIXMXT1OKesp"
+#define DEVICE_NAME     (char*)"VOIXMXT1OKesp;12010126;9dab2;1702137600"
+#define DEVICE_KEY      (char*)"42866c6458d133519e19bc5cab65441bd5e3303d5c1638a7ffb559acf522cd15;hmacsha256"
 
-#define MQTT_SERVER     "ON74ZK6IWN.iotcloud.tencentdevices.com"
+#define MQTT_SERVER     "VOIXMXT1OK.iotcloud.tencentdevices.com"
 #define MQTT_PORT       "1883"
 
-#define SUB_TOPIC       "$thing/down/property/PM62I41E39/ESP8266"
-#define PUB_TOPIC       "$thing/up/property/PM62I41E39/ESP8266"
+#define SUB_TOPIC       "$thing/down/property/VOIXMXT1OK/esp"
+#define PUB_TOPIC       "$thing/up/property/VOIXMXT1OK/esp"
 
 #define MQTT_MAX_BUFF       512
 

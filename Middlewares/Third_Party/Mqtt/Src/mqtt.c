@@ -55,7 +55,7 @@ bool mqtt_init()
 
     if(mqtt_lock != NULL)
     {
-        Log_w("mqtt initialed");
+        Log_w("mqtt is initialed");
         return false;
     }
 
@@ -105,9 +105,7 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
     }
     resp->buf_size = AT_BUFF_LEN;
 
-    mqtt_flag_clear(MQTT_CON_FLAG);     //清除目的标志位
-
-    if(!transport_sendPacketBuffer(mqtt_buff, len, resp))       //发送报文
+    if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_CON_FLAG, MQTT_WAIT_TIME_MS))       //发送报文
     {
         Log_e("connect msg send failed");
         ret = false;
@@ -115,20 +113,6 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
     }
 
     memset(mqtt_buff, 0, MQTT_MAX_BUFF);
-
-    target_time = HAL_GetTick() + MQTT_WAIT_TIME_MS;
-
-    while(!mqtt_flag_get(MQTT_CON_FLAG) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
-
-    if(HAL_GetTick() >= target_time)
-    {
-        Log_e("mqtt connect timeout");
-        ret = false;
-        goto EXIT;
-    }
-
-    mqtt_flag_clear(MQTT_CON_FLAG);
-
 
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == CONNACK)     //解析响应报文
     {
@@ -172,7 +156,7 @@ void mqtt_disconnect()
 
     uint16_t len = MQTTSerialize_disconnect(mqtt_buff, MQTT_MAX_BUFF);
 
-    if(!transport_sendPacketBuffer(mqtt_buff, len, NULL))
+    if(!transport_sendPacketBuffer(mqtt_buff, len, NULL, 0, 0))
     {
         Log_e("disconnect mug send failed");
     }
@@ -219,9 +203,7 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
         goto EXIT;
     }
 
-    mqtt_flag_clear(MQTT_SUB_FLAG);
-
-    if(!transport_sendPacketBuffer(mqtt_buff, len, resp))
+    if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_SUB_FLAG, MQTT_WAIT_TIME_MS))
     {
         Log_e("sub msg send failed");
         ret = false;
@@ -230,26 +212,13 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
 
     memset(mqtt_buff, 0, MQTT_MAX_BUFF);
 
-    target_time = HAL_GetTick() + MQTT_WAIT_TIME_MS;
-
-    while(!mqtt_flag_get(MQTT_SUB_FLAG) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
-
-    if(HAL_GetTick() >= target_time)
-    {
-        Log_e("mqtt sub timeout");
-        ret = false;
-        goto EXIT;
-    }
-
-    mqtt_flag_clear(MQTT_SUB_FLAG);
-
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == SUBACK)
     {
         uint16_t subid;
         uint16_t sub_count;
         uint8_t qos;
 
-        uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, (char*)&qos, mqtt_buff, MQTT_MAX_BUFF);
+        uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, mqtt_buff, MQTT_MAX_BUFF);
 
         if(!rc || subid != msgid || qos == 0x80)
             ret = false;
@@ -296,9 +265,7 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
         goto EXIT;
     }
 
-    mqtt_flag_clear(MQTT_UNSUB_FLAG);
-
-    if(!transport_sendPacketBuffer(mqtt_buff, len, resp))
+    if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_UNSUB_FLAG, MQTT_WAIT_TIME_MS))
     {
         Log_e("unsub msg send failed");
         ret = false;
@@ -306,19 +273,6 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
     }
 
     memset(mqtt_buff, 0, MQTT_MAX_BUFF);
-
-    target_time = HAL_GetTick() + MQTT_WAIT_TIME_MS;
-
-    while(!mqtt_flag_get(MQTT_UNSUB_FLAG) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
-
-    if(HAL_GetTick() >= target_time)
-    {
-        Log_e("mqtt sub timeout");
-        ret = false;
-        goto EXIT;
-    }
-
-    mqtt_flag_clear(MQTT_UNSUB_FLAG);
 
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == UNSUBACK)
     {
@@ -374,7 +328,7 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
     topicName.cstring = (char*)pub_topic;
     uint16_t len = MQTTSerialize_publish(mqtt_buff, MQTT_MAX_BUFF, 0 ,0 , 0, 0, topicName, payload, strlen((char*)payload));
 
-    if(!transport_sendPacketBuffer(mqtt_buff, len, NULL))
+    if(!transport_sendPacketBuffer(mqtt_buff, len, NULL, 0, 0))
     {
         Log_e("pub msg send failed");
         ret = false;
@@ -421,9 +375,7 @@ bool mqtt_ping()
         goto EXIT;
     }
 
-    mqtt_flag_clear(MQTT_PING_FLAG);
-
-    if(!transport_sendPacketBuffer(mqtt_buff, len, resp))
+    if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_PING_FLAG, MQTT_WAIT_TIME_MS))
     {
         Log_e("pub msg send failed");
         ret = false;
@@ -433,17 +385,6 @@ bool mqtt_ping()
     memset(mqtt_buff,0, MQTT_MAX_BUFF);
 
     target_time = HAL_GetTick() + MQTT_WAIT_TIME_MS;
-
-    while(!mqtt_flag_get(MQTT_PING_FLAG) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
-
-    if(HAL_GetTick() >= target_time)
-    {
-        Log_e("mqtt sub timeout");
-        ret = false;
-        goto EXIT;
-    }
-
-    mqtt_flag_clear(MQTT_PING_FLAG);    
 
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) != PINGRESP)
     {

@@ -348,7 +348,7 @@ bool ESP8266_JoinAP(char *pSSID, char *pPassWord)
         return false;
     }
 
-    if(!ESP8266_Cmd(resp, 15000, "AT+CWJAP=\"%s\",\"%s\"\r\n", pSSID, pPassWord))
+    if(!ESP8266_Cmd(resp, 20000, "AT+CWJAP=\"%s\",\"%s\"\r\n", pSSID, pPassWord))
     {
         Log_e("Join ap failed");
         ret = false;
@@ -664,6 +664,7 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
 void esp_parse(void *arg)
 {
     tbsp_esp8266 p_esp = dev_esp_get();
+    uint8_t recv_type;
 
     Log_d("esp_parse start...");
 
@@ -676,7 +677,7 @@ void esp_parse(void *arg)
 #endif
             if(p_esp->status == ESP8266_INITIALIZED)    //已连接服务器，开启透传
             {
-                uint8_t recv_type = (p_esp->recv[0] & 0xff00) >> 4;
+                recv_type = (p_esp->recv[0]) >> 4;
                 //待替换非主动请求检测
                 if(recv_type == 3)//接收报文为publish
                 {

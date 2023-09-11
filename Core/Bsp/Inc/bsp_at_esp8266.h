@@ -41,7 +41,7 @@ typedef enum
 
 typedef enum
 {
-	STA = 0,
+	STA = 1,
   	AP,
   	STA_AP  
 }eESP_Mode;

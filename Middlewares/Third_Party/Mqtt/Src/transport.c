@@ -15,6 +15,7 @@
  *    Sergio R. Caprile - "commonalization" from prior samples and/or documentation extension
  *******************************************************************************/
 #include "log.h"
+#include "mqtt.h"
 #include "transport.h"
 #include "cmsis_os.h"
 #include "usart.h"
@@ -36,20 +37,37 @@ response_t mqtt_get_resp()
 	return &mqtt_resp;
 }
 
-bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp)
+bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp, uint16_t wait_flag, uint32_t wait_time)
 {
 	bool ret = true;
+	uint32_t target_time = HAL_GetTick() + wait_time;
 	tbsp_esp8266 p_esp = dev_esp_get();
 
 	HAL_MutexLock(p_esp->lock);
 
 	p_esp->resp = resp;
 
+	mqtt_flag_clear(wait_flag);
+
 	if(HAL_UART_Transmit(MQTT_USART, (uint8_t*)buf, buflen, HAL_MAX_DELAY) != HAL_OK)
 	{
 		Log_e("mqtt cmd send failed");
 		return false;
 	}
+
+	if(!wait_flag)	//无需等待标志位
+		goto EXIT;
+
+	while(!mqtt_flag_get(wait_flag) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
+    if(HAL_GetTick() >= target_time)
+    {
+        Log_e("mqtt reply timeout");
+        ret = false;
+    }
+
+	mqtt_flag_clear(wait_flag);
+
+	EXIT:
 
 	p_esp->resp = NULL;
 
