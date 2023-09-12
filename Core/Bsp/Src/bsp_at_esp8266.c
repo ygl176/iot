@@ -17,6 +17,7 @@
 #include "log.h"
 
 extern UART_HandleTypeDef huart1;
+extern void IOT_Template_Message_Arrived_CallBack(const char *data, int size);
 
 #define ESP_UART    (&huart1)
 #define AT_WAIT_MS  5000
@@ -645,7 +646,7 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
             is_full = true;
         }
 
-        if(p_esp->recv_notice && osSemaphoreGetCount(p_esp->sema_rx) == 0)
+        if(p_esp->recv_notice && ch == '\0' && p_esp->recv[read_len - 2] == '\n')
         {
             p_esp->recv_notice = false;
             if(is_full)
@@ -681,7 +682,7 @@ void esp_parse(void *arg)
                 //待替换非主动请求检测
                 if(recv_type == 3)//接收报文为publish
                 {
-                    
+                    IOT_Template_Message_Arrived_CallBack(p_esp->recv, p_esp->cur_recv_len);
                 }
                 else if(p_esp->resp != NULL) //mqtt主动请求
                 {

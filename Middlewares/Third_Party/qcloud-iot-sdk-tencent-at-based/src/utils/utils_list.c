@@ -18,8 +18,8 @@
 extern "C" {
 #endif
 
-#include "common.h"
 #include "utils_list.h"
+#include "qcloud_iot_api_export.h"
 
 
 

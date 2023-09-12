@@ -143,7 +143,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-//  ESP8266_Init();
+  ESP8266_Init();
 
   Log_i("esp ok");
 

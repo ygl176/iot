@@ -1,82 +1,69 @@
-/**
- * @file bsp_log.h
- * @author ygl
- * @brief 
- * @version 0.1
- * @date 2023-08-10
- * 
- * @copyright Copyright (c) 2023
- * 
- */
-
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef _AT_LOG_H_
+#define _AT_LOG_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
 
-// ÈÕÖ¾Êä³öµÈ¼¶
+/**
+ * æ—¥å¿—è¾“å‡ºç­‰çº§
+ */
 typedef enum {
-    LOG_DEBUG,  //µ÷ÊÔ
-    LOG_INFO,   //Í¨Öª
-    LOG_WARN,   //¾¯¸æ
-    LOG_ERROR   //´íÎó
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARN,
+    LOG_ERROR
 } LOG_LEVEL;
 
-
-// È«¾ÖÈÕÖ¾¼¶±ğÊä³ö±êÖ¾, Ö»Êä³öĞ¡ÓÚ»òµÈÓÚ¸ÃµÈ¼¶µÄÈÕÖ¾ĞÅÏ¢
-// extern LOG_LEVEL g_log_level;
-
-
 /**
- * @brief ÉèÖÃÈ«¾ÖÈÕÖ¾Êä³ö¼¶±ğ±êÖ¾
- * 
- * @param level 
+ * å…¨å±€æ—¥å¿—çº§åˆ«è¾“å‡ºæ ‡å¿—, åªè¾“å‡ºå°äºæˆ–ç­‰äºè¯¥ç­‰çº§çš„æ—¥å¿—ä¿¡æ¯
  */
-void Log_Set_Level(LOG_LEVEL level);
+extern LOG_LEVEL g_log_level;
 
 
 /**
- * @brief »ñÈ¡µ±Ç°ÈÕÖ¾µÈ¼¶
- * 
- * @return LOG_LEVEL 
- */
-LOG_LEVEL Log_Get_Level(void);
-
-
-/**
- * @brief ÈÕÖ¾´òÓ¡º¯Êı£¬Ä¬ÈÏ´òÓ¡µ½±ê×¼Êä³ö
+ * @brief
  *
- * @param file Ô´ÎÄ¼şÃû
- * @param func º¯ÊıÃû
- * @param line ĞĞºÅ
- * @param level ÈÕÖ¾µÈ¼¶
+ * @param
+ */
+void At_Log_Set_Level(LOG_LEVEL level);
+
+/**
+ * @brief è·å–å½“å‰æ—¥å¿—ç­‰çº§
+ *
+ * @return
+ */
+LOG_LEVEL At_Log_Get_Level(void);
+
+
+/**
+ * @brief æ—¥å¿—æ‰“å°å‡½æ•°ï¼Œé»˜è®¤æ‰“å°åˆ°æ ‡å‡†è¾“å‡º
+ *
+ * @param file æºæ–‡ä»¶å
+ * @param func å‡½æ•°å
+ * @param line è¡Œå·
+ * @param level æ—¥å¿—ç­‰çº§
  */
 void Log_writter(const char *file, const char *func, const int line, const int level, const char *fmt, ...);
 
-#ifdef LOG
+/**
+ * @brief buffæ•°æ®dump
+ *
+ * @param pData å¾…dumpçš„buffæŒ‡é’ˆ
+ * @param len   å¾…dumpçš„buffæ•°æ®é•¿åº¦
+ */
+void HexDump(const uint8_t *pData, unsigned int len);
 
 #define Log_d(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_DEBUG, args)
 #define Log_i(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_INFO, args)
 #define Log_w(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_WARN, args)
 #define Log_e(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_ERROR, args)
-
-#else
-
-#define Log_d(args...)
-#define Log_i(args...)
-#define Log_w(args...)
-#define Log_e(args...)
-
-#endif  //LOG
 
 //#define DEBUG_EABLE
 #ifdef DEBUG_EABLE
@@ -110,4 +97,4 @@ void Log_writter(const char *file, const char *func, const int line, const int l
 }
 #endif
 
-#endif //_LOG_H_
+#endif /* QCLOUD_IOT_EXPORT_LOG_H_ */

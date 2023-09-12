@@ -256,6 +256,14 @@ void USART1_IRQHandler(void)
   else if(__HAL_UART_GET_FLAG(&huart1, USART_SR_IDLE))
   {
 	  ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
+    if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, "\n", 1))
+    {
+	      Log_e("ring buff push err");
+    }
+    else
+    {
+	      HAL_SemaphoreRelease(p_esp->sema_rx);
+    }
 	  ch = '\0';
 	  p_esp->recv_notice = true;
   }

@@ -1,6 +1,15 @@
+/**
+******************************************************************************
+* @file    ringbuff.c 
+* @author  yougaliu
+* @version V1.0
+* @date    2018-09-12
+* @brief   This file contains function ring buffer operation
+******************************************************************************
+*/ 
 #include <stdio.h>
 #include "ringbuff.h"
-#include "string.h"
+#include "string.h "
 
 
 int ring_buff_init(sRingbuff* ring_buff, char* buff, uint32_t size )

@@ -22,7 +22,9 @@
 #include "MQTTUnsubscribe.h"
 
 static uint16_t mqtt_flag;
+static SubscribeParams sg_msg_handlers[QCLOUD_IOT_MAX_SUB_TOPIC] = {0}; /**< 订阅消息回调*/
 static void *mqtt_lock = NULL;
+
 
 void mqtt_flag_set(uint16_t flag)
 {
@@ -74,7 +76,6 @@ bool mqtt_init()
 bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key, uint16_t keep_alive)
 {
     bool ret = true;
-    uint32_t target_time;
     response_t resp = mqtt_get_resp();
 
     MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
@@ -91,11 +92,12 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
         Log_e("mqtt connect buf malloc failed");
         return false;
     }
+
     uint16_t len = MQTTSerialize_connect(mqtt_buff, MQTT_MAX_BUFF, &data);      //初始化报文
 
     HAL_MutexLock(mqtt_lock); //mqtt锁，指定 mqtt 响应报文接收缓冲区
 
-    resp->buf = malloc(AT_BUFF_LEN);        //mqtt 接收缓冲区申请
+    resp->buf = HAL_Malloc(MQTT_MAX_BUFF);        //mqtt 接收缓冲区申请
 
     if(resp->buf == NULL)
     {
@@ -103,7 +105,8 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
         ret = false;
         goto EXIT;
     }
-    resp->buf_size = AT_BUFF_LEN;
+
+    resp->buf_size = MQTT_MAX_BUFF;
 
     if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_CON_FLAG, MQTT_WAIT_TIME_MS))       //发送报文
     {
@@ -178,7 +181,6 @@ void mqtt_disconnect()
 bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
 {
     bool ret = true;
-    uint32_t target_time;
 
     response_t resp = mqtt_get_resp();
 
@@ -241,7 +243,6 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
 bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 {
     bool ret = true;
-    uint32_t target_time;
     MQTTString topicName = MQTTString_initializer;
     tbsp_esp8266 p_esp = dev_esp_get();
     response_t resp = mqtt_get_resp();
@@ -354,7 +355,6 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 bool mqtt_ping()
 {
     bool ret = true;
-    uint32_t target_time;
     response_t resp = mqtt_get_resp();
 
     uint8_t *mqtt_buff = HAL_Malloc(MQTT_MAX_BUFF);
@@ -383,8 +383,6 @@ bool mqtt_ping()
     }
 
     memset(mqtt_buff,0, MQTT_MAX_BUFF);
-
-    target_time = HAL_GetTick() + MQTT_WAIT_TIME_MS;
 
     if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) != PINGRESP)
     {

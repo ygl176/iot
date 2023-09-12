@@ -29,6 +29,22 @@
         "stdarg.h": "c",
         "log.h": "c",
         "bsp_at_esp8266.h": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "dev_info.h": "c",
+        "export_err.h": "c",
+        "functional": "c",
+        "data_template_client_common.h": "c",
+        "data_template_client.h": "c",
+        "data_template_client_json.h": "c",
+        "at_log.h": "c",
+        "stdlib.h": "c",
+        "qcloud_iot_api_export.h": "c",
+        "at_sanity_check.h": "c",
+        "qcloud_iot_export_error.h": "c",
+        "dev_config.h": "c",
+        "qcloud_iot_export_mqtt.h": "c",
+        "qcloud_iot_export_data_template.h": "c",
+        "at_utils.h": "c",
+        "lite-utils.h": "c"
     }
 }

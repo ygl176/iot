@@ -18,38 +18,8 @@ extern "C" {
 
 
 #include "config.h"
+#include "mqtt.h"
 #include "stdbool.h"
-
-/* 远程服务器地址 */
-#define MQTT_SERVER     "ON74ZK6IWN.iotcloud.tencentdevices.com"
-/* 远程服务器端口 */
-#define MQTT_PORT       "1883"
-
-/* 设备ID的最大长度, 必须保持唯一 */
-#define 	MAX_SIZE_OF_CLIENT_ID                                   (80)
-
-/* 产品名称的最大长度 */
-#define MAX_SIZE_OF_PRODUCT_ID                                    	(10)
-
-/* 产品密钥的最大长度 ，动态设备注册需要*/
-#define MAX_SIZE_OF_PRODUCT_SECRET                                  (48)
-
-
-/* 设备ID的最大长度 */
-#define MAX_SIZE_OF_DEVICE_NAME                                     (64)
-
-/* psk最大长度 */
-#define MAX_SIZE_OF_DEVICE_SERC  	 								(24)
-
-
-/* 设备证书文件名的最大长度 */
-#define MAX_SIZE_OF_DEVICE_CERT_FILE_NAME                           (128)
-
-/* 设备私钥文件名的最大长度 */
-#define MAX_SIZE_OF_DEVICE_KEY_FILE_NAME                            (128)
-
-/* 云端保留主题的最大长度 */
-#define MAX_SIZE_OF_CLOUD_TOPIC            ((MAX_SIZE_OF_DEVICE_NAME) + (MAX_SIZE_OF_PRODUCT_ID) + 64)
 
 
 typedef struct {

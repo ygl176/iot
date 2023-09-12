@@ -12,8 +12,9 @@
                 "${workspaceFolder}//Middlewares//Third_Party//FreeRTOS//Source//include",
                 "${workspaceFolder}//Middlewares//Third_Party//FreeRTOS//Source//CMSIS_RTOS_V2",
                 "${workspaceFolder}//Middlewares//Third_Party//FreeRTOS//Source//portable//GCC//ARM_CM3",
-                "${workspaceFolder}//Middlewares//Third_Party//Iot//Inc",
-                "${workspaceFolder}//Middlewares//Third_Party//Mqtt//Inc"
+                "${workspaceFolder}//Middlewares//Third_Party//qcloud-iot-sdk-tencent-at-based//include",
+                "${workspaceFolder}//Middlewares//Third_Party//Mqtt//Inc",
+                "${workspaceFolder}//Middlewares//Third_Party//qcloud-iot-sdk-tencent-at-based//src//include"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

@@ -1,3 +1,12 @@
+/**
+******************************************************************************
+* @file    ringbuff.h 
+* @author  yougaliu
+* @version V1.0
+* @date    2018-09-12
+* @brief   This file contains function ring buffer operation
+******************************************************************************
+*/ 
 #ifndef __RING_BUFF_H__
 #define __RING_BUFF_H__
 

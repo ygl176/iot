@@ -58,7 +58,7 @@ bool transport_sendPacketBuffer(unsigned char* buf, int buflen, response_t resp,
 	if(!wait_flag)	//无需等待标志位
 		goto EXIT;
 
-	while(!mqtt_flag_get(wait_flag) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
+	while((!mqtt_flag_get(wait_flag)) && HAL_GetTick() < target_time);  //规定时间内等待目的标志置位
     if(HAL_GetTick() >= target_time)
     {
         Log_e("mqtt reply timeout");

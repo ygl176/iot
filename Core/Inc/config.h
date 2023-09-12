@@ -41,4 +41,10 @@
 #define ESP_BUFF_LEN                   1024
 
 
+#ifdef  COMMA_TRANSFER_NEED	 
+#define T_	"\\" 							
+#else
+#define T_	
+#endif
+
 #endif //__CONFIG_H__
