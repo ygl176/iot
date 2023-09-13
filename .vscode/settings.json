@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "string.h": "c",
-        "mqtt.h": "c"
+        "mqtt.h": "c",
+        "_intsup.h": "c",
+        "newlib.h": "c"
     }
 }

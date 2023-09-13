@@ -74,17 +74,17 @@ static int _direct_update_value(char *value, DeviceProperty *pProperty) {
     } else if (pProperty->type == JINT16) {
     	rc = LITE_get_int16(pProperty->data, value);
     }
-//    else if (pProperty->type == JINT8) {
-//    	rc = LITE_get_int8(pProperty->data, value);
-//    }
+    else if (pProperty->type == JINT8) {
+    	rc = LITE_get_int8(pProperty->data, value);
+    }
     else if (pProperty->type == JUINT32) {
     	rc = LITE_get_uint32(pProperty->data, value);
     } else if (pProperty->type == JUINT16) {
     	rc = LITE_get_uint16(pProperty->data, value);
     }
-//    else if (pProperty->type == JUINT8) {
-//    	rc = LITE_get_uint8(pProperty->data, value);
-//    }
+    else if (pProperty->type == JUINT8) {
+    	rc = LITE_get_uint8(pProperty->data, value);
+    }
     else if (pProperty->type == JFLOAT) {
     	rc = LITE_get_float(pProperty->data, value);
     } else if (pProperty->type == JDOUBLE) {
@@ -109,7 +109,7 @@ static int _direct_update_value(char *value, DeviceProperty *pProperty) {
  */
 static int32_t _add_client_token(char *pJsonDocument, size_t maxSizeOfJsonDocument, uint32_t *tokenNumber) {
 
-    int32_t rc_of_snprintf = snprintf(pJsonDocument, maxSizeOfJsonDocument, "%s-%u", iot_device_info_get()->product_id, (*tokenNumber)++);
+    int32_t rc_of_snprintf = snprintf(pJsonDocument, maxSizeOfJsonDocument, "%s-%lu", iot_device_info_get()->product_id, (*tokenNumber)++);
 
     return rc_of_snprintf;
 }
@@ -275,7 +275,7 @@ void build_empty_json(uint32_t *tokenNumber, char *pJsonBuffer) {
 #ifdef QUOTES_TRANSFER_NEED
 	snprintf(pJsonBuffer, MAX_SIZE_OF_JSON_WITH_CLIENT_TOKEN, "{\\\"clientToken\\\":\\\"%s-%u\\\"}", iot_device_info_get()->product_id, (*tokenNumber)++);
 #else
-	snprintf(pJsonBuffer, MAX_SIZE_OF_JSON_WITH_CLIENT_TOKEN, "{\"clientToken\":\"%s-%u\"}", iot_device_info_get()->product_id, (*tokenNumber)++);
+	snprintf(pJsonBuffer, MAX_SIZE_OF_JSON_WITH_CLIENT_TOKEN, "{\"clientToken\":\"%s-%lu\"}", iot_device_info_get()->product_id, (*tokenNumber)++);
 #endif	
 }
 
