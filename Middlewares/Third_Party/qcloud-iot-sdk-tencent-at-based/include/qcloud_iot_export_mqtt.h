@@ -20,49 +20,49 @@
 
 
 
-#define 	QCLOUD_IOT_MAX_SUB_TOPIC 								(5)		//最多可订阅topic数
-#define 	MAX_TOPIC_NAME_LEN     									(138)	//topic名最长长度
-#define 	MAX_TOPIC_PAYLOAD_LEN   								(1024)  //topic 最长payload
+#define 	QCLOUD_IOT_MAX_SUB_TOPIC 								(5)		//���ɶ���topic��
+#define 	MAX_TOPIC_NAME_LEN     									(138)	//topic�������
+#define 	MAX_TOPIC_PAYLOAD_LEN   								(1024)  //topic �payload
 
-/* 设备ID的最大长度, 必须保持唯一 */
+/* �豸ID����󳤶�, ���뱣��Ψһ */
 #define 	MAX_SIZE_OF_CLIENT_ID                                   (80)
 
-/* MQTT 阻塞调用(包括连接, 订阅, 发布等)的超时时间, 单位:ms 建议5000ms */
+/* MQTT ��������(��������, ����, ������)�ĳ�ʱʱ��, ��λ:ms ����5000ms */
 #define QCLOUD_IOT_MQTT_COMMAND_TIMEOUT                             (10 * 1000)
 
 
-/* 产品名称的最大长度 */
+/* ��Ʒ���Ƶ���󳤶� */
 #define MAX_SIZE_OF_PRODUCT_ID                                    	(10)
 
-/* 产品密钥的最大长度 ，动态设备注册需要*/
+/* ��Ʒ��Կ����󳤶� ����̬�豸ע����Ҫ*/
 #define MAX_SIZE_OF_PRODUCT_SECRET                                  (48)
 
 
-/* 设备ID的最大长度 */
+/* �豸ID����󳤶� */
 #define MAX_SIZE_OF_DEVICE_NAME                                     (64)
 
-/* psk最大长度 */
+/* psk��󳤶� */
 #define MAX_SIZE_OF_DEVICE_SERC  	 								(24)
 
 
-/* 设备证书文件名的最大长度 */
+/* �豸֤���ļ�������󳤶� */
 #define MAX_SIZE_OF_DEVICE_CERT_FILE_NAME                           (128)
 
-/* 设备私钥文件名的最大长度 */
+/* �豸˽Կ�ļ�������󳤶� */
 #define MAX_SIZE_OF_DEVICE_KEY_FILE_NAME                            (128)
 
 
-/* 云端保留主题的最大长度 */
+/* �ƶ˱����������󳤶� */
 #define MAX_SIZE_OF_CLOUD_TOPIC            ((MAX_SIZE_OF_DEVICE_NAME) + (MAX_SIZE_OF_PRODUCT_ID) + 64)
 
 /**
- * @brief 接入鉴权方式
+ * @brief �����Ȩ��ʽ
  */
 
 typedef enum{
-	eNO_TLS = 0,		//直连,无TLS
-	ePSK_TLS = 1,		//PSK方式TLS
-	eCERT_TLS = 2,		//证书方式TLS
+	eNO_TLS = 0,		//ֱ��,��TLS
+	ePSK_TLS = 1,		//PSK��ʽTLS
+	eCERT_TLS = 2,		//֤�鷽ʽTLS
 }eTlsMode;
 
 typedef enum _eClientState_{
@@ -72,39 +72,39 @@ typedef enum _eClientState_{
 
 
 /**
- * @brief 服务质量等级
+ * @brief ���������ȼ�
  *
- * 服务质量等级表示PUBLISH消息分发的质量等级
+ * ���������ȼ���ʾPUBLISH��Ϣ�ַ��������ȼ�
  */
 typedef enum _QoS {
-    QOS0 = 0,    // 至多分发一次
-    QOS1 = 1,    // 至少分发一次, 消息的接收者需回复PUBACK报文
-    QOS2 = 2     // 仅分发一次, 目前腾讯物联云不支持该等级
+    QOS0 = 0,    // ����ַ�һ��
+    QOS1 = 1,    // ���ٷַ�һ��, ��Ϣ�Ľ�������ظ�PUBACK����
+    QOS2 = 2     // ���ַ�һ��, Ŀǰ��Ѷ�����Ʋ�֧�ָõȼ�
 } QoS;
 
 typedef struct {
 	eTlsMode 					tlsmod;
-    uint32_t					command_timeout;		 // 发布订阅信令读写超时时间 ms
-    uint32_t					keep_alive_interval_ms;	 // 心跳周期, 单位: s
-    uint8_t         			clean_session;			 // 清理会话标志位
-    uint8_t                   	auto_connect_enable;     // 是否开启自动重连 1:启用自动重连 0：不启用自动重连  建议为1
+    uint32_t					command_timeout;		 // �������������д��ʱʱ�� ms
+    uint32_t					keep_alive_interval_ms;	 // ��������, ��λ: s
+    uint8_t         			clean_session;			 // �����Ự��־λ
+    uint8_t                   	auto_connect_enable;     // �Ƿ����Զ����� 1:�����Զ����� 0���������Զ�����  ����Ϊ1
 } MQTTInitParams;
 
 
 /**
- * @brief MQTT初始化参数结构体默认值定义
+ * @brief MQTT��ʼ�������ṹ��Ĭ��ֵ����
  */
 #define DEFAULT_MQTTINIT_PARAMS {ePSK_TLS, QCLOUD_IOT_MQTT_COMMAND_TIMEOUT, 240, 1, 1}
 
 /**
- * @brief MQTT PUBLISH 消息回调处理函数指针定义
+ * @brief MQTT PUBLISH ��Ϣ�ص���������ָ�붨��
  */
 typedef void (*OnMessageHandler)(char *msg, void *context);
 
 
 /**
- * @brief 客户端最大订阅 Topic 数，请根据业务场景，
- * 实际订阅的最大 Topic 数情况进行配置。
+ * @brief �ͻ�������� Topic ���������ҵ�񳡾���
+ * ʵ�ʶ��ĵ���� Topic ������������á�
  */
 typedef struct _SubscribeParams_ {
 	char* topicFilter;

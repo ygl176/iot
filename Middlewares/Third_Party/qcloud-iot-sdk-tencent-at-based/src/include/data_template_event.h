@@ -31,7 +31,7 @@ extern "C" {
 #define SIGLE_EVENT			    (1) 
 #define MUTLTI_EVENTS		    (2)
 
-//äº‹ä»¶ä¸ŠæŠ¥æ˜¯å¦å¸¦æ—¶æˆ³ï¼Œå¦‚æœå¸¦ï¼Œéœ€è¦ä¿è¯ä¸ºUTCå‡†ç¡®æ—¶é—´ã€‚å¦åˆ™ä¸è¦å¸¦ï¼ŒæœåŠ¡ç«¯ä¼šè®°å½•æ”¶åˆ°äº‹ä»¶ä¸ŠæŠ¥çš„æ—¶é—´æˆ³
+//ÊÂ¼şÉÏ±¨ÊÇ·ñ´øÊ±´Á£¬Èç¹û´ø£¬ĞèÒª±£Ö¤ÎªUTC×¼È·Ê±¼ä¡£·ñÔò²»Òª´ø£¬·şÎñ¶Ë»á¼ÇÂ¼ÊÕµ½ÊÂ¼şÉÏ±¨µÄÊ±¼ä´Á
 //#define EVENT_TIMESTAMP_USED	(1) 
 #define MAX_EVENT_WAIT_REPLY    (10) 
 #define EVENT_MAX_DATA_NUM		(255)
@@ -42,7 +42,7 @@ extern "C" {
 
 		
 /**
- * @brief EVENTæ“ä½œæ–¹æ³•ï¼Œä¸ŠæŠ¥å’Œå›å¤
+ * @brief EVENT²Ù×÷·½·¨£¬ÉÏ±¨ºÍ»Ø¸´
  */
 typedef enum {
     eEVENT_POST,    
@@ -51,11 +51,11 @@ typedef enum {
 
 
 typedef struct _sReply_{
-    char       client_token[EVENT_TOKEN_MAX_LEN];               // æ ‡è¯†è¯¥è¯·æ±‚çš„clientTokenå­—æ®µ
-    void       *user_context;                                   // ç”¨æˆ·æ•°æ®
-    Timer      timer;                                           // è¯·æ±‚è¶…æ—¶å®šæ—¶å™¨
+    char       client_token[EVENT_TOKEN_MAX_LEN];               // ±êÊ¶¸ÃÇëÇóµÄclientToken×Ö¶Î
+    void       *user_context;                                   // ÓÃ»§Êı¾İ
+    Timer      timer;                                           // ÇëÇó³¬Ê±¶¨Ê±Æ÷
 
-    OnEventReplyCallback      callback;                         // äº‹ä»¶ä¸ŠæŠ¥å›å¤å›è°ƒ
+    OnEventReplyCallback      callback;                         // ÊÂ¼şÉÏ±¨»Ø¸´»Øµ÷
 } sReply;
 
 typedef enum _eEventDealType_{

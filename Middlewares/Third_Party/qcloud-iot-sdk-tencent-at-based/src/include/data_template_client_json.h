@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#include "hal_export.h"
+#include "utils_timer.h"
 #include "qcloud_iot_export_method.h"
 #include "qcloud_iot_export_mqtt.h"
 
@@ -30,23 +30,23 @@ extern "C" {
 #define min(a,b) (a) < (b) ? (a) : (b)
 
 
-/* åœ¨ä»»æ„ç»™å®šæ—¶é—´å†…, å¤„äºŽappendingçŠ¶æ€çš„è¯·æ±‚æœ€å¤§ä¸ªæ•° */
+/* ÔÚÈÎÒâ¸ø¶¨Ê±¼äÄÚ, ´¦ÓÚappending×´Ì¬µÄÇëÇó×î´ó¸öÊý */
 #define MAX_APPENDING_REQUEST_AT_ANY_GIVEN_TIME                     (10)
 
-/* åœ¨ä»»æ„ç»™å®šæ—¶é—´å†…, å¯ä»¥åŒæ—¶æ“ä½œè®¾å¤‡çš„æœ€å¤§ä¸ªæ•° */
+/* ÔÚÈÎÒâ¸ø¶¨Ê±¼äÄÚ, ¿ÉÒÔÍ¬Ê±²Ù×÷Éè±¸µÄ×î´ó¸öÊý */
 #define MAX_DEVICE_HANDLED_AT_ANY_GIVEN_TIME                        (10)
 
-/* é™¤è®¾å¤‡åç§°ä¹‹å¤–, äº‘ç«¯ä¿ç•™ä¸»é¢˜çš„æœ€å¤§é•¿åº¦ */
+/* ³ýÉè±¸Ãû³ÆÖ®Íâ, ÔÆ¶Ë±£ÁôÖ÷ÌâµÄ×î´ó³¤¶È */
 #define MAX_SIZE_OF_CLOUD_TOPIC_WITHOUT_DEVICE_NAME                 (60)
 
-/* æŽ¥æ”¶äº‘ç«¯è¿”å›žçš„JSONæ–‡æ¡£çš„bufferå¤§å° */
-#define CLOUD_IOT_JSON_RX_BUF_LEN                                   (CLINET_BUFF_LEN + 1)
+/* ½ÓÊÕÔÆ¶Ë·µ»ØµÄJSONÎÄµµµÄbuffer´óÐ¡ */
+#define CLOUD_IOT_JSON_RX_BUF_LEN                                   (MAX_TOPIC_PAYLOAD_LEN + 1)
 
 
-/* ä¸€ä¸ªclientTokençš„æœ€å¤§é•¿åº¦ */
+/* Ò»¸öclientTokenµÄ×î´ó³¤¶È */
 #define MAX_SIZE_OF_CLIENT_TOKEN                                    (MAX_SIZE_OF_CLIENT_ID + 10)
 
-/* ä¸€ä¸ªä»…åŒ…å«clientTokenå­—æ®µçš„JSONæ–‡æ¡£çš„æœ€å¤§é•¿åº¦ */
+/* Ò»¸ö½ö°üº¬clientToken×Ö¶ÎµÄJSONÎÄµµµÄ×î´ó³¤¶È */
 #define MAX_SIZE_OF_JSON_WITH_CLIENT_TOKEN                          (MAX_SIZE_OF_CLIENT_TOKEN + 20)
 
 
@@ -59,56 +59,56 @@ extern "C" {
 #define REPLY_CODE					"code"
 #define REPLY_STATUS				"status"
 
-#define GET_STATUS					"get_status"			//è®¾å¤‡ä¸»åŠ¨æŸ¥è¯¢æ•°æ®çŠ¶æ€
-#define GET_STATUS_REPLY			"get_status_reply"		//æœåŠ¡ç«¯å›žå¤æ•°æ®çŠ¶æ€æŸ¥è¯¢
+#define GET_STATUS					"get_status"			//Éè±¸Ö÷¶¯²éÑ¯Êý¾Ý×´Ì¬
+#define GET_STATUS_REPLY			"get_status_reply"		//·þÎñ¶Ë»Ø¸´Êý¾Ý×´Ì¬²éÑ¯
 
-#define CONTROL_CMD					"control"				//æœåŠ¡ç«¯ä¸‹è¡ŒæŽ§åˆ¶å‘½ä»¤
-#define CONTROL_CMD_REPLY			"control_reply"			//è®¾å¤‡å›žå¤æŽ§åˆ¶å‘½ä»¤
+#define CONTROL_CMD					"control"				//·þÎñ¶ËÏÂÐÐ¿ØÖÆÃüÁî
+#define CONTROL_CMD_REPLY			"control_reply"			//Éè±¸»Ø¸´¿ØÖÆÃüÁî
 
 #define CLEAR_CONTROL				"clear_control"
 
-#define REPORT_CMD					"report"				//è®¾å¤‡ä¸Šè¡Œä¸ŠæŠ¥æ•°æ®
-#define REPORT_CMD_REPLY			"report_reply"			//æœåŠ¡ç«¯å›žå¤æ•°æ®ä¸ŠæŠ¥
+#define REPORT_CMD					"report"				//Éè±¸ÉÏÐÐÉÏ±¨Êý¾Ý
+#define REPORT_CMD_REPLY			"report_reply"			//·þÎñ¶Ë»Ø¸´Êý¾ÝÉÏ±¨
 
-#define INFO_CMD					"report_info"			//è®¾å¤‡ä¿¡æ¯ä¸ŠæŠ¥
-#define INFO_CMD_REPLY				"report_info_reply"		//è®¾å¤‡ä¿¡æ¯ä¸ŠæŠ¥å›žå¤
+#define INFO_CMD					"report_info"			//Éè±¸ÐÅÏ¢ÉÏ±¨
+#define INFO_CMD_REPLY				"report_info_reply"		//Éè±¸ÐÅÏ¢ÉÏ±¨»Ø¸´
 
 
 #define GET_CONTROL_PARA			"data.control"
 #define CMD_CONTROL_PARA			"params"
 
 /**
- * @brief æ–‡æ¡£æ“ä½œè¯·æ±‚çš„å‚æ•°ç»“æž„ä½“å®šä¹‰
+ * @brief ÎÄµµ²Ù×÷ÇëÇóµÄ²ÎÊý½á¹¹Ìå¶¨Òå
  */
 typedef struct _RequestParam {
 
-    Method               	method;              	// æ–‡æ¡£è¯·æ±‚æ–¹å¼: GET, REPORT, RINFO, REPLY,CLEAR
+    Method               	method;              	// ÎÄµµÇëÇó·½Ê½: GET, REPORT, RINFO, REPLY,CLEAR
 
-    uint32_t             	timeout_sec;         	// è¯·æ±‚è¶…æ—¶æ—¶é—´, å•ä½:s
+    uint32_t             	timeout_sec;         	// ÇëÇó³¬Ê±Ê±¼ä, µ¥Î»:s
 
-    OnRequestCallback    	request_callback;    	// è¯·æ±‚å›žè°ƒæ–¹æ³•
+    OnRequestCallback    	request_callback;    	// ÇëÇó»Øµ÷·½·¨
 
-    void                 	*user_context;          // ç”¨æˆ·æ•°æ®, ä¼šé€šè¿‡å›žè°ƒæ–¹æ³•OnRequestCallbackè¿”å›ž
+    void                 	*user_context;          // ÓÃ»§Êý¾Ý, »áÍ¨¹ý»Øµ÷·½·¨OnRequestCallback·µ»Ø
 
 } RequestParams;
 
 #define DEFAULT_REQUEST_PARAMS {GET, 4, NULL, NULL};
 
 /**
- * @brief ä»£è¡¨ä¸€ä¸ªæ–‡æ¡£è¯·æ±‚
+ * @brief ´ú±íÒ»¸öÎÄµµÇëÇó
  */
 typedef struct {
-    char                   client_token[MAX_SIZE_OF_CLIENT_TOKEN];          // æ ‡è¯†è¯¥è¯·æ±‚çš„clientTokenå­—æ®µ
-    Method                 method;                                          // æ–‡æ¡£æ“ä½œæ–¹å¼
+    char                   client_token[MAX_SIZE_OF_CLIENT_TOKEN];          // ±êÊ¶¸ÃÇëÇóµÄclientToken×Ö¶Î
+    Method                 method;                                          // ÎÄµµ²Ù×÷·½Ê½
 
-    void                   *user_context;                                   // ç”¨æˆ·æ•°æ®
-    Timer                  timer;                                           // è¯·æ±‚è¶…æ—¶å®šæ—¶å™¨
+    void                   *user_context;                                   // ÓÃ»§Êý¾Ý
+    Timer                  timer;                                           // ÇëÇó³¬Ê±¶¨Ê±Æ÷
 
-    OnRequestCallback      callback;                                        // æ–‡æ¡£æ“ä½œè¯·æ±‚è¿”å›žå¤„ç†å‡½æ•°
+    OnRequestCallback      callback;                                        // ÎÄµµ²Ù×÷ÇëÇó·µ»Ø´¦Àíº¯Êý
 } Request;
 
 /**
- * @brief ç”¨äºŽç”Ÿæˆä¸åŒçš„ä¸»é¢˜
+ * @brief ÓÃÓÚÉú³É²»Í¬µÄÖ÷Ìâ
  */
 typedef enum {
     ACCEPTED, REJECTED, METHOD
@@ -116,13 +116,13 @@ typedef enum {
 
 
 /**
- * @brief è¯¥ç»“æž„ä½“ç”¨äºŽä¿å­˜å·²ç™»è®°çš„è®¾å¤‡å±žæ€§åŠè®¾å¤‡å±žæ€§å¤„ç†çš„å›žè°ƒæ–¹æ³•
+ * @brief ¸Ã½á¹¹ÌåÓÃÓÚ±£´æÒÑµÇ¼ÇµÄÉè±¸ÊôÐÔ¼°Éè±¸ÊôÐÔ´¦ÀíµÄ»Øµ÷·½·¨
  */
 typedef struct {
 
-    void *property;							// è®¾å¤‡å±žæ€§
+    void *property;							// Éè±¸ÊôÐÔ
 
-    OnPropRegCallback callback;      // å›žè°ƒå¤„ç†å‡½æ•°
+    OnPropRegCallback callback;      // »Øµ÷´¦Àíº¯Êý
 
 } PropertyHandler;
 
@@ -140,85 +140,85 @@ typedef struct {
 
 
 /**
- * @brief æ£€æŸ¥å‡½æ•°snprintfçš„è¿”å›žå€¼
+ * @brief ¼ì²éº¯ÊýsnprintfµÄ·µ»ØÖµ
  *
- * @param returnCode       å‡½æ•°snprintfçš„è¿”å›žå€¼
- * @param maxSizeOfWrite   å¯å†™æœ€å¤§å­—èŠ‚æ•°
- * @return                 è¿”å›žQCLOUD_ERR_JSON, è¡¨ç¤ºå‡ºé”™; è¿”å›žQCLOUD_ERR_JSON_BUFFER_TRUNCATED, è¡¨ç¤ºæˆªæ–­
+ * @param returnCode       º¯ÊýsnprintfµÄ·µ»ØÖµ
+ * @param maxSizeOfWrite   ¿ÉÐ´×î´ó×Ö½ÚÊý
+ * @return                 ·µ»ØQCLOUD_ERR_JSON, ±íÊ¾³ö´í; ·µ»ØQCLOUD_ERR_JSON_BUFFER_TRUNCATED, ±íÊ¾½Ø¶Ï
  */
 
 int check_snprintf_return(int32_t returnCode, size_t maxSizeOfWrite);
 
 /**
- * @brief åˆå§‹åŒ–è¯·æ±‚å‚æ•°
+ * @brief ³õÊ¼»¯ÇëÇó²ÎÊý
  *
- * @param pParams   å¾…åˆå§‹åŒ–è¯·æ±‚å‚æ•°æŒ‡é’ˆ
- * @param method    è¯·æ±‚æ–¹æ³•
- * @param callback  è¯·æ±‚å›žè°ƒ
- * @param userContext   ç”¨æˆ·æ•°æ®
+ * @param pParams   ´ý³õÊ¼»¯ÇëÇó²ÎÊýÖ¸Õë
+ * @param method    ÇëÇó·½·¨
+ * @param callback  ÇëÇó»Øµ÷
+ * @param userContext   ÓÃ»§Êý¾Ý
  */
 void init_request_params(RequestParams *pParams, Method method, OnRequestCallback callback, void *userContext, uint8_t timeout_sec);
 
 
 /**
- * @brief å°†å­—æºç¬¦ä¸²æ’å…¥åˆ°ç›®æ ‡å­—ç¬¦ä¸²æŒ‡å®šä½ç½®
+ * @brief ½«×ÖÔ´·û´®²åÈëµ½Ä¿±ê×Ö·û´®Ö¸¶¨Î»ÖÃ
  *
- * @param pSourceStr   æºå­—ç¬¦ä¸²
- * @param pDestStr     ç›®æ ‡è¾“å‡ºå­—ç¬¦ä¸²
- * @param pos          ç›®æ ‡ä¸²æ’å…¥ä½ç½®
+ * @param pSourceStr   Ô´×Ö·û´®
+ * @param pDestStr     Ä¿±êÊä³ö×Ö·û´®
+ * @param pos          Ä¿±ê´®²åÈëÎ»ÖÃ
  */
 void insert_str(char *pDestStr, char *pSourceStr, int pos);
 
 
 /**
- * å°†ä¸€ä¸ªJSONèŠ‚ç‚¹å†™å…¥åˆ°JSONä¸²ä¸­
+ * ½«Ò»¸öJSON½ÚµãÐ´Èëµ½JSON´®ÖÐ
  *
- * @param jsonBuffer   	JSONä¸²
- * @param sizeOfBuffer  å¯å†™å…¥å¤§å°
- * @param pKey          JSONèŠ‚ç‚¹çš„key
- * @param pData         JSONèŠ‚ç‚¹çš„value
- * @param type          JSONèŠ‚ç‚¹valueçš„æ•°æ®ç±»åž‹
- * @return              è¿”å›žQCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param jsonBuffer   	JSON´®
+ * @param sizeOfBuffer  ¿ÉÐ´Èë´óÐ¡
+ * @param pKey          JSON½ÚµãµÄkey
+ * @param pData         JSON½ÚµãµÄvalue
+ * @param type          JSON½ÚµãvalueµÄÊý¾ÝÀàÐÍ
+ * @return              ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int put_json_node(char *jsonBuffer, size_t sizeOfBuffer, const char *pKey, void *pData, JsonDataType type);
 
 /**
- * å°†ä¸€ä¸ªJSONèŠ‚ç‚¹å†™å…¥åˆ°JSONä¸²ä¸­,ç‰©æ¨¡åž‹å¯¹boolç±»åž‹çš„å¤„ç†æœ‰åŒºåˆ†ã€‚
+ * ½«Ò»¸öJSON½ÚµãÐ´Èëµ½JSON´®ÖÐ,ÎïÄ£ÐÍ¶ÔboolÀàÐÍµÄ´¦ÀíÓÐÇø·Ö¡£
  *
- * @param jsonBuffer   	JSONä¸²
- * @param sizeOfBuffer  å¯å†™å…¥å¤§å°
- * @param pKey          JSONèŠ‚ç‚¹çš„key
- * @param pData         JSONèŠ‚ç‚¹çš„value
- * @param type          JSONèŠ‚ç‚¹valueçš„æ•°æ®ç±»åž‹
- * @return              è¿”å›žQCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param jsonBuffer   	JSON´®
+ * @param sizeOfBuffer  ¿ÉÐ´Èë´óÐ¡
+ * @param pKey          JSON½ÚµãµÄkey
+ * @param pData         JSON½ÚµãµÄvalue
+ * @param type          JSON½ÚµãvalueµÄÊý¾ÝÀàÐÍ
+ * @return              ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int template_put_json_node(char *jsonBuffer, size_t sizeOfBuffer, const char *pKey, void *pData, JsonDataType type);
 
 
 /**
- * @brief è¿”å›žä¸€ä¸ªClientToken
+ * @brief ·µ»ØÒ»¸öClientToken
  *
- * @param pStrBuffer    å­˜å‚¨ClientTokençš„å­—ç¬¦ä¸²ç¼“å†²åŒº
- * @param sizeOfBuffer  ç¼“å†²åŒºå¤§å°
- * @param tokenNumber   shadowçš„tokenå€¼ï¼Œå‡½æ•°å†…éƒ¨æ¯æ¬¡æ‰§è¡Œå®Œä¼šè‡ªå¢ž
- * @return              è¿”å›žQCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param pStrBuffer    ´æ´¢ClientTokenµÄ×Ö·û´®»º³åÇø
+ * @param sizeOfBuffer  »º³åÇø´óÐ¡
+ * @param tokenNumber   shadowµÄtokenÖµ£¬º¯ÊýÄÚ²¿Ã¿´ÎÖ´ÐÐÍê»á×ÔÔö
+ * @return              ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int generate_client_token(char *pStrBuffer, size_t sizeOfBuffer, uint32_t *tokenNumber);
 
 /**
- * @brief ä¸ºGETå’ŒDELETEè¯·æ±‚æž„é€ ä¸€ä¸ªåªå¸¦æœ‰clientTokenå­—æ®µçš„JSONæ–‡æ¡£
+ * @brief ÎªGETºÍDELETEÇëÇó¹¹ÔìÒ»¸öÖ»´øÓÐclientToken×Ö¶ÎµÄJSONÎÄµµ
  *
- * @param tokenNumber   shadowçš„tokenå€¼ï¼Œå‡½æ•°å†…éƒ¨æ¯æ¬¡æ‰§è¡Œå®Œä¼šè‡ªå¢ž
- * @param pJsonBuffer å­˜å‚¨JSONæ–‡æ¡£çš„å­—ç¬¦ä¸²ç¼“å†²åŒº
+ * @param tokenNumber   shadowµÄtokenÖµ£¬º¯ÊýÄÚ²¿Ã¿´ÎÖ´ÐÐÍê»á×ÔÔö
+ * @param pJsonBuffer ´æ´¢JSONÎÄµµµÄ×Ö·û´®»º³åÇø
  */
 void build_empty_json(uint32_t *tokenNumber, char *pJsonBuffer);
 
 /**
- * @brief ä»ŽJSONæ–‡æ¡£ä¸­è§£æžå‡ºclientTokenå­—æ®µ
+ * @brief ´ÓJSONÎÄµµÖÐ½âÎö³öclientToken×Ö¶Î
  *
- * @param pJsonDoc       å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pClientToken   ClientTokenå­—æ®µ
- * @return               è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc       ´ý½âÎöµÄJSONÎÄµµ
+ * @param pClientToken   ClientToken×Ö¶Î
+ * @return               ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_client_token(char *pJsonDoc, char **pClientToken);
 
@@ -253,57 +253,57 @@ bool parse_action_input(char *pJsonDoc, char **pActionInput);
 
 
 /**
- * @brief ä»ŽJSONæ–‡æ¡£ä¸­è§£æžå‡ºstatuså­—æ®µ,äº‹ä»¶å›žå¤
+ * @brief ´ÓJSONÎÄµµÖÐ½âÎö³östatus×Ö¶Î,ÊÂ¼þ»Ø¸´
  *
- * @param pJsonDoc       å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pStatus   	 statuså­—æ®µ
- * @return               è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc       ´ý½âÎöµÄJSONÎÄµµ
+ * @param pStatus   	 status×Ö¶Î
+ * @return               ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_status_return(char *pJsonDoc, char **pStatus);
 
 /**
- * @brief ä»ŽJSONæ–‡æ¡£ä¸­è§£æžå‡ºcodeå­—æ®µ,äº‹ä»¶å›žå¤
+ * @brief ´ÓJSONÎÄµµÖÐ½âÎö³öcode×Ö¶Î,ÊÂ¼þ»Ø¸´
  *
- * @param pJsonDoc       å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pCode   		 Codeå­—æ®µ
- * @return               è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc       ´ý½âÎöµÄJSONÎÄµµ
+ * @param pCode   		 Code×Ö¶Î
+ * @return               ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_code_return(char *pJsonDoc, int32_t *pCode);
 
 
 /**
- * @brief å¦‚æžœJSONæ–‡æ¡£ä¸­çš„keyä¸ŽæŸä¸ªè®¾å¤‡å±žæ€§çš„keyåŒ¹é…çš„è¯, åˆ™æ›´æ–°è¯¥è®¾å¤‡å±žæ€§, è¯¥è®¾å¤‡å±žæ€§çš„å€¼ä¸èƒ½ä¸ºOBJECTç±»åž‹
+ * @brief Èç¹ûJSONÎÄµµÖÐµÄkeyÓëÄ³¸öÉè±¸ÊôÐÔµÄkeyÆ¥ÅäµÄ»°, Ôò¸üÐÂ¸ÃÉè±¸ÊôÐÔ, ¸ÃÉè±¸ÊôÐÔµÄÖµ²»ÄÜÎªOBJECTÀàÐÍ
  *
- * @param pJsonDoc       JSONæ–‡æ¡£
- * @param pProperty      è®¾å¤‡å±žæ€§
- * @return               è¿”å›žtrue, è¡¨ç¤ºæˆåŠŸ
+ * @param pJsonDoc       JSONÎÄµµ
+ * @param pProperty      Éè±¸ÊôÐÔ
+ * @return               ·µ»Øtrue, ±íÊ¾³É¹¦
  */
 bool update_value_if_key_match(char *pJsonDoc, DeviceProperty *pProperty);
 
 /**
- * @brief ä»ŽJSONæ–‡æ¡£ä¸­è§£æžå‡ºmethodå­—æ®µ
+ * @brief ´ÓJSONÎÄµµÖÐ½âÎö³ömethod×Ö¶Î
  *
- * @param pJsonDoc         å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pErrorMessage    è¾“å‡ºmethodå­—æ®µ
- * @return                 è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc         ´ý½âÎöµÄJSONÎÄµµ
+ * @param pErrorMessage    Êä³ömethod×Ö¶Î
+ * @return                 ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_template_method_type(char *pJsonDoc, char **pMethod);
 
 /**
- * @brief ä»Žget_status_reply çš„JSONæ–‡æ¡£ä¸­è§£æžå‡ºcontrolå­—æ®µ
+ * @brief ´Óget_status_reply µÄJSONÎÄµµÖÐ½âÎö³öcontrol×Ö¶Î
  *
- * @param pJsonDoc         å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pErrorMessage    è¾“å‡ºcontrolå­—æ®µ
- * @return                 è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc         ´ý½âÎöµÄJSONÎÄµµ
+ * @param pErrorMessage    Êä³öcontrol×Ö¶Î
+ * @return                 ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_template_get_control(char *pJsonDoc, char **control);
 
 /**
- * @brief ä»Žcontrol çš„JSONæ–‡æ¡£ä¸­è§£æžå‡ºcontrolå­—æ®µ
+ * @brief ´Ócontrol µÄJSONÎÄµµÖÐ½âÎö³öcontrol×Ö¶Î
  *
- * @param pJsonDoc         å¾…è§£æžçš„JSONæ–‡æ¡£
- * @param pErrorMessage    è¾“å‡ºcontrolå­—æ®µ
- * @return                 è¿”å›žtrue, è¡¨ç¤ºè§£æžæˆåŠŸ
+ * @param pJsonDoc         ´ý½âÎöµÄJSONÎÄµµ
+ * @param pErrorMessage    Êä³öcontrol×Ö¶Î
+ * @return                 ·µ»Øtrue, ±íÊ¾½âÎö³É¹¦
  */
 bool parse_template_cmd_control(char *pJsonDoc, char **control);
 

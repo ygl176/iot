@@ -55,7 +55,7 @@ uint32_t IOT_Event_getFlag(void *client)
 
 
 /**
- * @brief éåŽ†äº‹ä»¶åˆ—è¡¨
+ * @brief ±éÀúÊÂ¼þÁÐ±í
  */
 static void _traverse_event_list(Qcloud_IoT_Template *pTemplate, List *list, const char *pClientToken, char *message, eEventDealType eDealType)
 {
@@ -84,7 +84,7 @@ static void _traverse_event_list(Qcloud_IoT_Template *pTemplate, List *list, con
             }
 			
 			sReply *pReply =  (sReply *)node->val;						
-			/*åˆ—è¡¨äº‹ä»¶è¶…æ—¶æ£€æŸ¥*/
+			/*ÁÐ±íÊÂ¼þ³¬Ê±¼ì²é*/
 			if(eDEAL_EXPIRED == eDealType){
 				if(expired(&pReply->timer)){
 					Log_e("eventToken[%s] timeout",pReply->client_token);
@@ -93,7 +93,7 @@ static void _traverse_event_list(Qcloud_IoT_Template *pTemplate, List *list, con
 				}					
 			}
 
-			/*åˆ—è¡¨äº‹ä»¶å›žå¤åŒ¹é…*/
+			/*ÁÐ±íÊÂ¼þ»Ø¸´Æ¥Åä*/
 			if((eDEAL_REPLY_CB == eDealType) && (0 == strcmp(pClientToken, pReply->client_token))){						
 				if(NULL != pReply->callback){
 					pReply->callback(message, pTemplate);
@@ -132,13 +132,13 @@ static void _on_event_reply_callback(char *msg, void *context)
 
 	Log_d("Receive event reply message: %s", msg);
 
-	// è§£æžäº‹ä»¶å›žå¤ä¸­çš„clientToken
+	// ½âÎöÊÂ¼þ»Ø¸´ÖÐµÄclientToken
     if (!parse_client_token(msg, &client_token)) {
         Log_e("fail to parse client token!");
         return;
     }
 
-	// è§£æžäº‹ä»¶å›žå¤ä¸­çš„å¤„ç†ç»“æžœ
+	// ½âÎöÊÂ¼þ»Ø¸´ÖÐµÄ´¦Àí½á¹û
 	if(!parse_code_return(msg, &code)){
         Log_e("fail to parse code");
         return;
@@ -161,7 +161,7 @@ static void _on_event_reply_callback(char *msg, void *context)
 
 
 /**
- * @brief åˆ›å»ºäº‹ä»¶å›žå¤ç»“æž„ä½“å¹¶æ·»åŠ åˆ°å›žå¤ç­‰å¾…åˆ—è¡¨
+ * @brief ´´½¨ÊÂ¼þ»Ø¸´½á¹¹Ìå²¢Ìí¼Óµ½»Ø¸´µÈ´ýÁÐ±í
  */
 static sReply * _create_event_add_to_list(Qcloud_IoT_Template *pTemplate, OnEventReplyCallback replyCb, uint32_t reply_timeout_ms)
 {
@@ -276,7 +276,7 @@ static int _IOT_Construct_Event_JSON(void *handle, char *jsonBuffer, size_t size
 		 return QCLOUD_ERR_JSON_BUFFER_TOO_SMALL;
 	 }
 
-	if(event_count > SIGLE_EVENT){//å¤šä¸ªäº‹ä»¶
+	if(event_count > SIGLE_EVENT){//¶à¸öÊÂ¼þ
 #ifdef QUOTES_TRANSFER_NEED	
 		rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "\\\"events\\\":[");
 #else
@@ -358,7 +358,7 @@ static int _IOT_Construct_Event_JSON(void *handle, char *jsonBuffer, size_t size
 		}
 		
 #ifdef QUOTES_TRANSFER_NEED	
-		//è½¬ä¹‰ç¬¦å­˜åœ¨æ—¶ä¸º \,
+		//×ªÒå·û´æÔÚÊ±Îª \,
 		jsonBuffer[strlen(jsonBuffer) - 1] = '\0';
 #endif		
 		rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, "]");
@@ -367,7 +367,7 @@ static int _IOT_Construct_Event_JSON(void *handle, char *jsonBuffer, size_t size
 				return rc;
 		}
 
-	}else{ //å•ä¸ªäº‹ä»¶		
+	}else{ //µ¥¸öÊÂ¼þ		
 		sEvent *pEvent = pEventArry[0];
 		if(0 == pEvent->timestamp){ //no accurate UTC time, set 0
 #ifdef QUOTES_TRANSFER_NEED

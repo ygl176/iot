@@ -18,8 +18,8 @@
 #include "qcloud_iot_export_mqtt.h"
 
 typedef enum{
-	eDISCONNECTED = 0,  //æœªè¿žæŽ¥
-	eCONNECTED = 1,		//å·²è¿žæŽ¥
+	eDISCONNECTED = 0,  //Î´Á¬½Ó
+	eCONNECTED = 1,		//ÒÑÁ¬½Ó
 }eMqtt_State;
 
 
@@ -32,8 +32,8 @@ typedef enum{
 	eMODULE_DEFAULT = 0xFF,
 }eModuleType;
 
-eAtResault module_init(eModuleType eType);
-eAtResault module_handshake(uint32_t timeout);
+// eAtResault module_init(eModuleType eType);
+// eAtResault module_handshake(uint32_t timeout);
 eAtResault module_info_set(DeviceInfo *pInfo, eTlsMode eMode);
 eAtResault module_mqtt_conn(MQTTInitParams init_params);
 eAtResault module_mqtt_discon(void);

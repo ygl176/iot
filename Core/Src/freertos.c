@@ -43,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+extern void data_template_sample(void);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -143,17 +143,19 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-  ESP8266_Init();
+  // ESP8266_Init();
 
-  Log_i("esp ok");
+  // Log_i("esp ok");
 
-  mqtt_init();
+  // mqtt_init();
 
-  mqtt_connect((uint8_t*)CLIENT_ID, (uint8_t*)DEVICE_NAME, (uint8_t*)DEVICE_KEY, 120);
+  // mqtt_connect((uint8_t*)CLIENT_ID, (uint8_t*)DEVICE_NAME, (uint8_t*)DEVICE_KEY, 120);
 
-  mqtt_subscribe((uint8_t*)SUB_TOPIC, 0, 0);
+  // mqtt_subscribe((uint8_t*)SUB_TOPIC, 0, 0);
 
-  Log_i("mqtt ok");
+  // Log_i("mqtt ok");
+
+  data_template_sample();
 
   osThreadExit();
   /* Infinite loop */

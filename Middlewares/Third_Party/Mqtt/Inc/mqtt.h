@@ -73,26 +73,6 @@
  *
  * 服务质量等级表示PUBLISH消息分发的质量等级
  */
-typedef enum _QoS {
-    QOS0 = 0,    // 至多分发一次
-    QOS1 = 1,    // 至少分发一次, 消息的接收者需回复PUBACK报文
-    QOS2 = 2     // 仅分发一次, 目前腾讯物联云不支持该等级
-} QoS;
-
-/**
- * @brief MQTT PUBLISH 消息回调处理函数指针定义
- */
-typedef void (*OnMessageHandler)(char *msg, void *context);
-
-//订阅主题控制块
-typedef struct _SubscribeParams_ {
-	char* topicFilter;
-	QoS eqos;
-	OnMessageHandler fp;
-	void * context;
-} SubscribeParams;
-
-
 
 void mqtt_flag_set(uint16_t flag);
 void mqtt_flag_clear(uint16_t flag);
@@ -105,8 +85,5 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid);
 bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid);
 bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload);
 bool mqtt_ping();
-
-eResault register_sub_topic(SubscribeParams* subpara);
-eResault deliver_message(const char *data, uint32_t size);
 
 #endif //__MQTT_H__

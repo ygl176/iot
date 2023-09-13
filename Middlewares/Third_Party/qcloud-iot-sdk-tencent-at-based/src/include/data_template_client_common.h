@@ -23,30 +23,30 @@ extern "C" {
 #include "data_template_client.h"
 
 /**
- * @brief å¦‚æœæ²¡æœ‰è®¢é˜…deltaä¸»é¢˜, åˆ™è¿›è¡Œè®¢é˜…, å¹¶æ³¨å†Œç›¸åº”è®¾å¤‡å±æ€§
+ * @brief Èç¹ûÃ»ÓĞ¶©ÔÄdeltaÖ÷Ìâ, Ôò½øĞĞ¶©ÔÄ, ²¢×¢²áÏàÓ¦Éè±¸ÊôĞÔ
  *
  * @param pTemplate   template client
- * @param pProperty è®¾å¤‡å±æ€§
- * @param callback  ç›¸åº”è®¾å¤‡å±æ€§å¤„ç†å›è°ƒå‡½æ•°
- * @return          è¿”å›QCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param pProperty Éè±¸ÊôĞÔ
+ * @param callback  ÏàÓ¦Éè±¸ÊôĞÔ´¦Àí»Øµ÷º¯Êı
+ * @return          ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int template_common_register_property_on_delta(Qcloud_IoT_Template *pTemplate, DeviceProperty *pProperty, OnPropRegCallback callback);
 
 /**
- * @brief ç§»é™¤æ³¨å†Œè¿‡çš„è®¾å¤‡å±æ€§
+ * @brief ÒÆ³ı×¢²á¹ıµÄÉè±¸ÊôĞÔ
  *
  * @param pTemplate   template client
- * @param pProperty è®¾å¤‡å±æ€§
- * @return          è¿”å›QCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param pProperty Éè±¸ÊôĞÔ
+ * @return          ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int template_common_remove_property(Qcloud_IoT_Template *ptemplate, DeviceProperty *pProperty);
 
 /**
- * @brief æ£€æŸ¥æ³¨å†Œå±æ€§æ˜¯å¦å·²ç»å­˜åœ¨
+ * @brief ¼ì²é×¢²áÊôĞÔÊÇ·ñÒÑ¾­´æÔÚ
  *
  * @param pTemplate   template client
- * @param pProperty è®¾å¤‡å±æ€§
- * @return          è¿”å› 0, è¡¨ç¤ºå±æ€§ä¸å­˜åœ¨
+ * @param pProperty Éè±¸ÊôĞÔ
+ * @return          ·µ»Ø 0, ±íÊ¾ÊôĞÔ²»´æÔÚ
  */
 int template_common_check_property_existence(Qcloud_IoT_Template *ptemplate, DeviceProperty *pProperty);
 

@@ -14,7 +14,7 @@
  */
 
 /**
- * @brief æ•°æ®æ¨¡æ¿ç›¸å…³çš„ä¸€äº›æ¥å£
+ * @brief Êı¾İÄ£°åÏà¹ØµÄÒ»Ğ©½Ó¿Ú
  *
  */
 #ifndef IOT_TEMPLATE_CLIENT_H_
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
-#include "at_client.h"
+// #include "at_client.h"
 #include "utils_list.h"
 #include "data_template_client_json.h"
 #include "qcloud_iot_export_data_template.h"
@@ -43,8 +43,8 @@ typedef struct _TemplateInnerData {
     List *reply_list;
 	List *action_handle_list;
     List *property_handle_list;
-	char *upstream_topic;		//ä¸Šè¡Œtopic
-    char *downstream_topic;		//ä¸‹è¡Œtopic
+	char *upstream_topic;		//ÉÏĞĞtopic
+    char *downstream_topic;		//ÏÂĞĞtopic
 } TemplateInnerData;
 
 typedef struct _Template {
@@ -61,14 +61,14 @@ typedef struct _DownStreamMsg
 
 
 /**
- * @brief åˆå§‹åŒ–data template client
+ * @brief ³õÊ¼»¯data template client
  * 
  * @param pTemplate   data template client
  */
 int qcloud_iot_template_init(Qcloud_IoT_Template *pTemplate);
 
 /**
- * @brief å»åˆå§‹åŒ–data template client åˆ—è¡¨åŠæ¶ˆæ¯è®¢é˜…
+ * @brief È¥³õÊ¼»¯data template client ÁĞ±í¼°ÏûÏ¢¶©ÔÄ
  * 
  * @param pClient   data template client
  */
@@ -76,14 +76,14 @@ int qcloud_iot_template_init(Qcloud_IoT_Template *pTemplate);
 void qcloud_iot_template_reset(void *pClient);
 
 /**
- * @brief å¤„ç†ä¸Šè¡Œæ¶ˆæ¯å·²ç»è¶…æ—¶çš„å›å¤ç­‰å¾…
+ * @brief ´¦ÀíÉÏĞĞÏûÏ¢ÒÑ¾­³¬Ê±µÄ»Ø¸´µÈ´ı
  * 
  * @param pTemplate   data template client
  */
 void handle_template_expired_reply(Qcloud_IoT_Template *pTemplate);
 
 /**
- * @brief è·å–controlæ¶ˆæ¯çš„clientToken, ç”¨äºcontrol_reply
+ * @brief »ñÈ¡controlÏûÏ¢µÄclientToken, ÓÃÓÚcontrol_reply
  * 
  * @param void
  * @return clientToken
@@ -91,22 +91,22 @@ void handle_template_expired_reply(Qcloud_IoT_Template *pTemplate);
 char *  get_control_clientToken(void);
 
 /**
- * @brief æ•°æ®æ¨¡æ¿æ¶ˆæ¯ä¸Šè¡Œ
+ * @brief Êı¾İÄ£°åÏûÏ¢ÉÏĞĞ
  *
  * @param pTemplate     data template client
- * @param pParams  		è¯·æ±‚å‚æ•°
- * @param pJsonDoc 		è¯·æ±‚æ–‡æ¡£
- * @param sizeOfBuffer 	æ–‡æ¡£ç¼“å†²åŒºå¤§å°
- * @return         		è¿”å›QCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @param pParams  		ÇëÇó²ÎÊı
+ * @param pJsonDoc 		ÇëÇóÎÄµµ
+ * @param sizeOfBuffer 	ÎÄµµ»º³åÇø´óĞ¡
+ * @return         		·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 
 int send_template_request(Qcloud_IoT_Template *pTemplate, RequestParams *pParams, char *pJsonDoc, size_t sizeOfBuffer);
 
 /**
- * @brief è®¢é˜…æ•°æ®æ¨¡æ¿ä¸‹è¡Œtopic
+ * @brief ¶©ÔÄÊı¾İÄ£°åÏÂĞĞtopic
  *
  * @param pTemplate     template client
- * @return         		è¿”å›QCLOUD_ERR_SUCCESS, è¡¨ç¤ºæˆåŠŸ
+ * @return         		·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾³É¹¦
  */
 int subscribe_template_downstream_topic(Qcloud_IoT_Template *pTemplate);
 

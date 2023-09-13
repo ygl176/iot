@@ -21,7 +21,7 @@ extern "C" {
 #include "qcloud_iot_api_export.h"
 
 /**
- * @brief å°†æ³¨å†Œå±æ€§çš„å›è°ƒå‡½æ•°ä¿å­˜åˆ°åˆ—è¡¨ä¹‹ä¸­
+ * @brief ½«×¢²áÊôĞÔµÄ»Øµ÷º¯Êı±£´æµ½ÁĞ±íÖ®ÖĞ
  */
 static int _add_property_handle_to_template_list(Qcloud_IoT_Template *pTemplate, DeviceProperty *pProperty, OnPropRegCallback callback)
 {

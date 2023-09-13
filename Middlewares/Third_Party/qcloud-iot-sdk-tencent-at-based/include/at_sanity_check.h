@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "at_log.h"
+#include "log.h"
 
 
 #define NUMBERIC_SANITY_CHECK(num, err) \

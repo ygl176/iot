@@ -22,7 +22,6 @@
 #include "MQTTUnsubscribe.h"
 
 static uint16_t mqtt_flag;
-static SubscribeParams sg_msg_handlers[QCLOUD_IOT_MAX_SUB_TOPIC] = {0}; /**< 订阅消息回调*/
 static void *mqtt_lock = NULL;
 
 
@@ -115,20 +114,13 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
         goto EXIT;
     }
 
-    memset(mqtt_buff, 0, MQTT_MAX_BUFF);
+    uint8_t sessionPresent,connack_rc;
 
-    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == CONNACK)     //解析响应报文
+    if(MQTTDeserialize_connack(&sessionPresent, &connack_rc, mqtt_buff, MQTT_MAX_BUFF) != 1 || connack_rc != 0)
     {
-        uint8_t sessionPresent,connack_rc;
-
-        if(MQTTDeserialize_connack(&sessionPresent, &connack_rc, mqtt_buff, MQTT_MAX_BUFF) != 1 || connack_rc != 0)
-        {
-            Log_e("mqtt connect ack failed");
-            ret = false;
-        }
-    }
-    else
+        Log_e("mqtt connect ack failed");
         ret = false;
+    }
 
     EXIT: //程序错误退出
 
@@ -212,20 +204,13 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
         goto EXIT;
     }
 
-    memset(mqtt_buff, 0, MQTT_MAX_BUFF);
+    uint16_t subid;
+    uint16_t sub_count;
+    uint8_t qos;
 
-    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == SUBACK)
-    {
-        uint16_t subid;
-        uint16_t sub_count;
-        uint8_t qos;
+    uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, mqtt_buff, MQTT_MAX_BUFF);
 
-        uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, mqtt_buff, MQTT_MAX_BUFF);
-
-        if(!rc || subid != msgid || qos == 0x80)
-            ret = false;
-    }
-    else
+    if(!rc || subid != msgid || qos == 0x80)
         ret = false;
 
     EXIT:
@@ -273,18 +258,12 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
         goto EXIT;
     }
 
-    memset(mqtt_buff, 0, MQTT_MAX_BUFF);
 
-    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) == UNSUBACK)
-    {
-        uint16_t unsub_id;
+    uint16_t unsub_id;
 
-        uint8_t rc = MQTTDeserialize_unsuback(&unsub_id, mqtt_buff, MQTT_MAX_BUFF);
+    uint8_t rc = MQTTDeserialize_unsuback(&unsub_id, mqtt_buff, MQTT_MAX_BUFF);
 
-        if(!rc || unsub_id != msgid)
-            ret = false;
-    }
-    else 
+    if(!rc || unsub_id != msgid)
         ret = false;
     
     EXIT:
@@ -378,14 +357,6 @@ bool mqtt_ping()
     if(!transport_sendPacketBuffer(mqtt_buff, len, resp, MQTT_PING_FLAG, MQTT_WAIT_TIME_MS))
     {
         Log_e("pub msg send failed");
-        ret = false;
-        goto EXIT;
-    }
-
-    memset(mqtt_buff,0, MQTT_MAX_BUFF);
-
-    if(MQTTPacket_read(mqtt_buff, MQTT_MAX_BUFF, transport_getdata) != PINGRESP)
-    {
         ret = false;
     }
 

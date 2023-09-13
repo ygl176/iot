@@ -18,26 +18,33 @@ extern "C" {
 #endif
     
 #include "utils_timer.h"
+#include "stm32f1xx_hal.h"
 
     
 bool expired(Timer *timer) {
-    return HAL_Timer_expired(timer);
+    uint32_t now_ts;
+	
+	now_ts	= HAL_GetTick();
+
+    return (now_ts > timer->end_time)?true:false;
 }
 
 void countdown_ms(Timer *timer, unsigned int timeout_ms) {
-    HAL_Timer_countdown_ms(timer, timeout_ms);
+    timer->end_time = HAL_GetTick();
+    timer->end_time += timeout_ms;	
 }
 
 void countdown(Timer *timer, unsigned int timeout) {
-    HAL_Timer_countdown(timer, timeout);
+    timer->end_time = HAL_GetTick();
+	timer->end_time += timeout*1000;
 }
 
 int left_ms(Timer *timer) {
-    return HAL_Timer_remain(timer);
+    return (int)(timer->end_time - HAL_GetTick());
 }
 
 void InitTimer(Timer *timer) {
-    HAL_Timer_init(timer);
+    timer->end_time = 0;
 }
     
 #ifdef __cplusplus

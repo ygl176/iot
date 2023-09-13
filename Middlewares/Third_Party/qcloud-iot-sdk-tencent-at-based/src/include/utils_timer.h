@@ -16,11 +16,16 @@
 #ifndef QCLOUD_IOT_UTILS_TIMER_H_
 #define QCLOUD_IOT_UTILS_TIMER_H_
 
-#include "hal_export.h"
+#include "config.h"
+#include "common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct _Timer_ {
+    uint32_t end_time;
+}Timer;
     
 // Add the platform specific timer includes to define the Timer struct
 

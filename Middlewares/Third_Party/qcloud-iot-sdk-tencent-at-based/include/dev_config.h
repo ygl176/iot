@@ -13,7 +13,8 @@
  */
 #ifndef _DEV_CONFIG_H_
 #define _DEV_CONFIG_H_
-#include "hal_export.h"
+// #include ""
+#include "common.h"
 #include "qcloud_iot_export_mqtt.h"
 
 typedef struct {

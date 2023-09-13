@@ -24,7 +24,7 @@ extern "C" {
 
 
  /*
- * åˆ›å»ºList. å¤±è´¥åˆ™è¿”å›NULL.
+ * ´´½¨List. Ê§°ÜÔò·µ»ØNULL.
  */
 List *list_new(void)
 {
@@ -42,7 +42,7 @@ List *list_new(void)
 }
 
 /*
- * å¤±è´¥Listçš„å†…å­˜.
+ * Ê§°ÜListµÄÄÚ´æ.
  */
 void list_destroy(List *self)
 {
@@ -63,7 +63,7 @@ void list_destroy(List *self)
 }
 
 /*
- * å°†ç»™å®šèŠ‚ç‚¹é™„åŠ åˆ°åˆ—è¡¨å¹¶è¿”å›è¯¥èŠ‚ç‚¹ï¼Œåœ¨å¤±è´¥æ—¶è¿”å›NULL.
+ * ½«¸ø¶¨½Úµã¸½¼Óµ½ÁĞ±í²¢·µ»Ø¸Ã½Úµã£¬ÔÚÊ§°ÜÊ±·µ»ØNULL.
  */
 ListNode *list_rpush(List *self, ListNode *node)
 {
@@ -86,7 +86,7 @@ ListNode *list_rpush(List *self, ListNode *node)
 }
 
 /*
- * å¼¹å‡ºåˆ—è¡¨ä¸­çš„æœ€åä¸€ä¸ªèŠ‚ç‚¹, å¤±è´¥è¿”å›NULL.
+ * µ¯³öÁĞ±íÖĞµÄ×îºóÒ»¸ö½Úµã, Ê§°Ü·µ»ØNULL.
  */
 ListNode *list_rpop(List *self)
 {
@@ -108,7 +108,7 @@ ListNode *list_rpop(List *self)
 }
 
 /*
- * å¼¹å‡ºåˆ—è¡¨ä¸­çš„é¦–ä¸ªèŠ‚ç‚¹, å¤±è´¥è¿”å›NULL.
+ * µ¯³öÁĞ±íÖĞµÄÊ×¸ö½Úµã, Ê§°Ü·µ»ØNULL.
  */
 ListNode *list_lpop(List *self)
 {
@@ -130,7 +130,7 @@ ListNode *list_lpop(List *self)
 }
 
 /*
- * é¢„å…ˆå°†ç»™å®šçš„èŠ‚ç‚¹æ·»åŠ åˆ°åˆ—è¡¨ä¸­ï¼Œå¹¶è¿”å›è¯¥èŠ‚ç‚¹ï¼Œåœ¨å¤±è´¥æ—¶è¿”å›NULL.
+ * Ô¤ÏÈ½«¸ø¶¨µÄ½ÚµãÌí¼Óµ½ÁĞ±íÖĞ£¬²¢·µ»Ø¸Ã½Úµã£¬ÔÚÊ§°ÜÊ±·µ»ØNULL.
  */
 ListNode *list_lpush(List *self, ListNode *node)
 {
@@ -153,7 +153,7 @@ ListNode *list_lpush(List *self, ListNode *node)
 }
 
 /*
- * æ ¹æ®valè¿”å›å¯¹åº”çš„èŠ‚ç‚¹ï¼Œæ²¡æœ‰åˆ™è¿”å›NULL.
+ * ¸ù¾İval·µ»Ø¶ÔÓ¦µÄ½Úµã£¬Ã»ÓĞÔò·µ»ØNULL.
  */
 ListNode *list_find(List *self, void *val)
 {
@@ -184,7 +184,7 @@ ListNode *list_find(List *self, void *val)
 }
 
 /*
- * æ ¹æ®indexè¿”å›å¯¹åº”çš„èŠ‚ç‚¹ï¼Œæ²¡æœ‰åˆ™è¿”å›NULL.
+ * ¸ù¾İindex·µ»Ø¶ÔÓ¦µÄ½Úµã£¬Ã»ÓĞÔò·µ»ØNULL.
  */
 ListNode *list_at(List *self, int index)
 {
@@ -215,7 +215,7 @@ ListNode *list_at(List *self, int index)
 }
 
 /*
- * ä»åˆ—è¡¨ä¸­åˆ é™¤ç»™å®šçš„èŠ‚ç‚¹ï¼Œé‡Šæ”¾å®ƒå’Œå®ƒçš„å€¼.
+ * ´ÓÁĞ±íÖĞÉ¾³ı¸ø¶¨µÄ½Úµã£¬ÊÍ·ÅËüºÍËüµÄÖµ.
  */
 void list_remove(List *self, ListNode *node)
 {
@@ -232,7 +232,7 @@ void list_remove(List *self, ListNode *node)
 }
 
 /*
- * åˆ›å»ºä¸€ä¸ªæ–°çš„ListIteratorï¼Œå¤±è´¥è¿”å›NULL, å¹¶ä¸”è®¾ç½®å…¶ListDirection.
+ * ´´½¨Ò»¸öĞÂµÄListIterator£¬Ê§°Ü·µ»ØNULL, ²¢ÇÒÉèÖÃÆäListDirection.
  */
 ListIterator *list_iterator_new(List *list, ListDirection direction)
 {
@@ -241,7 +241,7 @@ ListIterator *list_iterator_new(List *list, ListDirection direction)
 }
 
 /*
- * åˆ›å»ºä¸€ä¸ªæ–°çš„ListIterator, å¹¶è®¾ç½®åˆå§‹èŠ‚ç‚¹. å¤±è´¥åˆ™è¿”å›NULL.
+ * ´´½¨Ò»¸öĞÂµÄListIterator, ²¢ÉèÖÃ³õÊ¼½Úµã. Ê§°ÜÔò·µ»ØNULL.
  */
 ListIterator *list_iterator_new_from_node(ListNode *node, ListDirection direction)
 {
@@ -256,7 +256,7 @@ ListIterator *list_iterator_new_from_node(ListNode *node, ListDirection directio
 }
 
 /*
- * è¿”å›ä¸‹ä¸€ä¸ªèŠ‚ç‚¹, å¦‚æœæ²¡æœ‰æ›´å¤šçš„èŠ‚ç‚¹åˆ™è¿”å›NULL.
+ * ·µ»ØÏÂÒ»¸ö½Úµã, Èç¹ûÃ»ÓĞ¸ü¶àµÄ½ÚµãÔò·µ»ØNULL.
  */
 ListNode *list_iterator_next(ListIterator *self)
 {
@@ -268,7 +268,7 @@ ListNode *list_iterator_next(ListIterator *self)
 }
 
 /*
- * é‡Šæ”¾åˆ—è¡¨è¿­ä»£å™¨.
+ * ÊÍ·ÅÁĞ±íµü´úÆ÷.
  */
 void list_iterator_destroy(ListIterator *self)
 {
@@ -277,7 +277,7 @@ void list_iterator_destroy(ListIterator *self)
 }
 
 /*
- * æ ¹æ®é¢„è®¾å€¼æ¥åˆ›å»ºæ–°èŠ‚ç‚¹, å¤±è´¥åˆ™è¿”å›NULL.
+ * ¸ù¾İÔ¤ÉèÖµÀ´´´½¨ĞÂ½Úµã, Ê§°ÜÔò·µ»ØNULL.
  */
 ListNode *list_node_new(void *val)
 {

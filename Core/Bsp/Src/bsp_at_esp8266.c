@@ -10,7 +10,7 @@
  */
 
 #include <string.h>
-#include "dev_info.h"
+#include "MQTTPacket.h"
 #include "bsp_at_esp8266.h"
 #include "mqtt.h"
 #include "common.h"

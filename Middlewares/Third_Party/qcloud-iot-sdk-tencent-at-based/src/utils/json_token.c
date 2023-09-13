@@ -69,7 +69,7 @@ char *LITE_json_value_of(char *key, char *src)
     if (NULL == ret) {
         return NULL;
     }
-    HAL_Snprintf(ret, value_len + 1, "%s", value);
+    snprintf(ret, value_len + 1, "%s", value);
     return ret;
 }
 

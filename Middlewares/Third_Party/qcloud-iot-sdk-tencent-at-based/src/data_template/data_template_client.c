@@ -93,7 +93,7 @@ void IOT_Template_Message_Arrived_CallBack(const char *data, int size)
 	strncpy(node->data, data, size);
 	node->data[size] = '\0';
 	
-	list_lpush(template_client->inner_data.pMsgList, list_node_new(node)); //æ”¾å…¥è¯·æ±‚
+	list_lpush(template_client->inner_data.pMsgList, list_node_new(node)); //·ÅÈëÇëÇó
 }
 
 int IOT_Template_Register_Property(void *handle, DeviceProperty *pProperty, OnPropRegCallback callback) {
@@ -216,7 +216,7 @@ int IOT_Template_ClearControl(void *handle, char *pClientToken, OnRequestCallbac
 		IOT_FUNC_EXIT_RC(QCLOUD_ERR_MQTT_NO_CONN);
 	}
 
-	// å¦‚æœæ²¡æœ‰ä¹‹å‰æ²¡æœ‰è®¢é˜…$thing/down/propertyæˆåŠŸï¼Œå†ä¸€æ¬¡è®¢é˜…
+	// Èç¹ûÃ»ÓĞÖ®Ç°Ã»ÓĞ¶©ÔÄ$thing/down/property³É¹¦£¬ÔÙÒ»´Î¶©ÔÄ
 	if (template_client->inner_data.sync_status < 0) {
 		rc = subscribe_template_downstream_topic(template_client);
 		if (rc < 0)
@@ -229,7 +229,7 @@ int IOT_Template_ClearControl(void *handle, char *pClientToken, OnRequestCallbac
 #ifdef QUOTES_TRANSFER_NEED
 	int rc_of_snprintf = HAL_Snprintf(JsonDoc, MAX_CLEAE_DOC_LEN, "{\\\"clientToken\\\":\\\"%s\\\"}", pClientToken);
 #else
-	int rc_of_snprintf = HAL_Snprintf(JsonDoc, MAX_CLEAE_DOC_LEN, "{\"clientToken\":\"%s\"}", pClientToken);
+	int rc_of_snprintf = snprintf(JsonDoc, MAX_CLEAE_DOC_LEN, "{\"clientToken\":\"%s\"}", pClientToken);
 #endif
 	rc = check_snprintf_return(rc_of_snprintf, MAX_CLEAE_DOC_LEN);	
     if (rc != QCLOUD_RET_SUCCESS) {
@@ -266,7 +266,7 @@ int IOT_Template_JSON_ConstructReportArray(void *handle, char *jsonBuffer, size_
 #ifdef QUOTES_TRANSFER_NEED
     rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ""T_", \\\"params\\\":{");
 #else
-	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ", \"params\":{");
+	rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ", \"params\":{");
 #endif
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 
@@ -294,7 +294,7 @@ int IOT_Template_JSON_ConstructReportArray(void *handle, char *jsonBuffer, size_
 #ifdef COMMA_TRANSFER_NEED		
 	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 2, remain_size, "}}");
 #else
-	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, "}}");
+	rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, "}}");
 #endif
 
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
@@ -324,7 +324,7 @@ int IOT_Template_Report(void *handle, char *pJsonDoc, size_t sizeOfBuffer, OnRep
 		IOT_FUNC_EXIT_RC(QCLOUD_ERR_MQTT_NO_CONN);
 	}
 
-	// å¦‚æœæ²¡æœ‰ä¹‹å‰æ²¡æœ‰è®¢é˜…$thing/down/propertyæˆåŠŸï¼Œå†ä¸€æ¬¡è®¢é˜…
+	// Èç¹ûÃ»ÓĞÖ®Ç°Ã»ÓĞ¶©ÔÄ$thing/down/property³É¹¦£¬ÔÙÒ»´Î¶©ÔÄ
 	if (template_client->inner_data.sync_status < 0) {
 		rc = subscribe_template_downstream_topic(template_client);
 		if (rc < 0)
@@ -379,7 +379,7 @@ int IOT_Template_Report_Sync(void *handle, char *pJsonDoc, size_t sizeOfBuffer, 
 
 int IOT_Template_JSON_ConstructSysInfo(void *handle, char *jsonBuffer, size_t sizeOfBuffer, DeviceProperty *pPlatInfo, DeviceProperty *pSelfInfo) 
 {		
-	POINTER_SANITY_CHECK(jsonBuffer, QCLOUD_  ERR_INVAL);
+	POINTER_SANITY_CHECK(jsonBuffer, QCLOUD_ERR_INVAL);
 	POINTER_SANITY_CHECK(pPlatInfo, QCLOUD_ERR_INVAL);
 
 	Qcloud_IoT_Template* ptemplate = (Qcloud_IoT_Template*)handle;
@@ -404,7 +404,7 @@ int IOT_Template_JSON_ConstructSysInfo(void *handle, char *jsonBuffer, size_t si
 #ifdef QUOTES_TRANSFER_NEED
     rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ""T_", \\\"params\\\":{");
 #else
-	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ",\"params\":{");
+	rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, ",\"params\":{");
 #endif
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 
@@ -425,7 +425,7 @@ int IOT_Template_JSON_ConstructSysInfo(void *handle, char *jsonBuffer, size_t si
         return QCLOUD_ERR_JSON_BUFFER_TOO_SMALL;
     }
 
-    rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}"T_",");
+    rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}"T_",");
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 
 	if (rc != QCLOUD_RET_SUCCESS) {
@@ -444,7 +444,7 @@ int IOT_Template_JSON_ConstructSysInfo(void *handle, char *jsonBuffer, size_t si
 #ifdef QUOTES_TRANSFER_NEED
 	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - pos - 1, remain_size, ""T_",\\\"device_label\\\":{");
 #else
-	rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - pos - 1, remain_size, ",\"device_label\":{");
+	rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - pos - 1, remain_size, ",\"device_label\":{");
 #endif
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 
@@ -460,7 +460,7 @@ int IOT_Template_JSON_ConstructSysInfo(void *handle, char *jsonBuffer, size_t si
    		pJsonNode++;
     }
 
-    rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}}"T_",");
+    rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}}"T_",");
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 	if (rc != QCLOUD_RET_SUCCESS) {
 		return rc;
@@ -470,7 +470,7 @@ end:
 	if ((remain_size = sizeOfBuffer - strlen(jsonBuffer)) <= 1) {
         return QCLOUD_ERR_JSON_BUFFER_TOO_SMALL;
     }
-    rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}");
+    rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - pos, remain_size, "}");
     rc = check_snprintf_return(rc_of_snprintf, remain_size);
 
 	return rc;
@@ -492,7 +492,7 @@ int IOT_Template_Report_SysInfo(void *handle, char *pJsonDoc, size_t sizeOfBuffe
 		IOT_FUNC_EXIT_RC(QCLOUD_ERR_MQTT_NO_CONN);
 	}
 
-	// å¦‚æœæ²¡æœ‰ä¹‹å‰æ²¡æœ‰è®¢é˜…$thing/down/propertyæˆåŠŸï¼Œå†ä¸€æ¬¡è®¢é˜…
+	// Èç¹ûÃ»ÓĞÖ®Ç°Ã»ÓĞ¶©ÔÄ$thing/down/property³É¹¦£¬ÔÙÒ»´Î¶©ÔÄ
 	if (template_client->inner_data.sync_status < 0) {
 		rc = subscribe_template_downstream_topic(template_client);
 		if (rc < 0)
@@ -561,7 +561,7 @@ int IOT_Template_GetStatus(void *handle, OnReplyCallback callback, void *userCon
 	}
 
 
-	// å¦‚æœæ²¡æœ‰ä¹‹å‰æ²¡æœ‰è®¢é˜…$thing/down/propertyæˆåŠŸï¼Œå†ä¸€æ¬¡è®¢é˜…
+	// Èç¹ûÃ»ÓĞÖ®Ç°Ã»ÓĞ¶©ÔÄ$thing/down/property³É¹¦£¬ÔÙÒ»´Î¶©ÔÄ
 	if (template_client->inner_data.sync_status < 0) {
 		rc = subscribe_template_downstream_topic(template_client);
 		if (rc < 0)
@@ -629,7 +629,7 @@ static int _template_ConstructControlReply(char *jsonBuffer, size_t sizeOfBuffer
 #ifdef QUOTES_TRANSFER_NEED
 	rc_of_snprintf = HAL_Snprintf(jsonBuffer , remain_size, "{\\\"code\\\":%d"T_", \\\"clientToken\\\":\\\"%s\\\""T_",", replyPara->code, get_control_clientToken());
 #else
-	rc_of_snprintf = HAL_Snprintf(jsonBuffer , remain_size, "{\"code\":%d, \"clientToken\":\"%s\",", replyPara->code, get_control_clientToken());
+	rc_of_snprintf = snprintf(jsonBuffer , remain_size, "{\"code\":%d, \"clientToken\":\"%s\",", replyPara->code, get_control_clientToken());
 #endif
 	rc = check_snprintf_return(rc_of_snprintf, remain_size);
 	
@@ -645,10 +645,10 @@ static int _template_ConstructControlReply(char *jsonBuffer, size_t sizeOfBuffer
 #ifdef QUOTES_TRANSFER_NEED		
 		rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "\\\"status\\\":\\\"%s\\\"}", replyPara->status_msg);
 #else
-		rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "\"status\":\"%s\"}", replyPara->status_msg);
+		rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "\"status\":\"%s\"}", replyPara->status_msg);
 #endif
 	}else{		
-		rc_of_snprintf = HAL_Snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, "}");		
+		rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer) - 1, remain_size, "}");
 	}
 
 	rc = check_snprintf_return(rc_of_snprintf, remain_size);
@@ -671,7 +671,7 @@ int IOT_Template_ControlReply(void *handle, char *pJsonDoc, size_t sizeOfBuffer,
 		IOT_FUNC_EXIT_RC(QCLOUD_ERR_MQTT_NO_CONN);
 	}
 
-	// å¦‚æœæ²¡æœ‰ä¹‹å‰æ²¡æœ‰è®¢é˜…$thing/down/propertyæˆåŠŸï¼Œå†ä¸€æ¬¡è®¢é˜…
+	// Èç¹ûÃ»ÓĞÖ®Ç°Ã»ÓĞ¶©ÔÄ$thing/down/property³É¹¦£¬ÔÙÒ»´Î¶©ÔÄ
 	if (template_client->inner_data.sync_status < 0) {
 		rc = subscribe_template_downstream_topic(template_client);
 		if (rc < 0)

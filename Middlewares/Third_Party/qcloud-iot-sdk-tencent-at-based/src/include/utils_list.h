@@ -24,7 +24,7 @@ extern "C" {
 
 
 /*
- * ListNodeè¿­ä»£å™¨çš„æ–¹å‘.
+ * ListNodeµü´úÆ÷µÄ·½Ïò.
  */
 typedef enum {
     LIST_HEAD,
@@ -32,7 +32,7 @@ typedef enum {
 } ListDirection;
 
 /*
- * é“¾è¡¨èŠ‚ç‚¹å®šä¹‰.
+ * Á´±í½Úµã¶¨Òå.
  */
 typedef struct ListNode {
     struct ListNode *prev;
@@ -41,7 +41,7 @@ typedef struct ListNode {
 } ListNode;
 
 /*
- * é“¾è¡¨.
+ * Á´±í.
  */
 typedef struct {
     ListNode *head;
@@ -52,7 +52,7 @@ typedef struct {
 } List;
 
 /*
- * è¿­ä»£å™¨.
+ * µü´úÆ÷.
  */
 typedef struct {
     ListNode *next;
@@ -60,10 +60,10 @@ typedef struct {
 } ListIterator;
 
 
-/* èŠ‚ç‚¹. */
+/* ½Úµã. */
 ListNode *list_node_new(void *val);
 
-/* é“¾è¡¨. */
+/* Á´±í. */
 List *list_new(void);
 
 ListNode *list_rpush(List *self, ListNode *node);
@@ -82,7 +82,7 @@ void list_remove(List *self, ListNode *node);
 
 void list_destroy(List *self);
 
-/* è¿­ä»£å™¨. */
+/* µü´úÆ÷. */
 ListIterator *list_iterator_new(List *list, ListDirection direction);
 
 ListIterator *list_iterator_new_from_node(ListNode *node, ListDirection direction);

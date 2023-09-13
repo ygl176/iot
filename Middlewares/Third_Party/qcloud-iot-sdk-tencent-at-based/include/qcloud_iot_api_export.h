@@ -18,8 +18,10 @@
 #define QCLOUD_IOT_AT_SDK_VERSION       "3.0.0"
 
 #include "config.h"
-#include "at_log.h"
-#include "hal_export.h"
+#include "log.h"
+// #include "hal_export.h"
+#include "common.h"
+#include "config.h"
 #include "dev_config.h"
 #include "module_api_inf.h"
 #include "at_sanity_check.h"

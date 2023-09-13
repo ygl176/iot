@@ -14,10 +14,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "at_utils.h"
+#include "MQTTPacket.h"
 #include "qcloud_iot_api_export.h"
 
-static SubscribeParams sg_msg_handlers[QCLOUD_IOT_MAX_SUB_TOPIC] = {0}; /**< è®¢é˜…æ¶ˆæ¯å›žè°ƒ*/
+static SubscribeParams sg_msg_handlers[QCLOUD_IOT_MAX_SUB_TOPIC] = {0}; /**< ¶©ÔÄÏûÏ¢»Øµ÷*/
 static bool sg_mqtt_lock = false;  //To do:  use mutex instand
 
 
@@ -101,7 +101,7 @@ eAtResault register_sub_topic(SubscribeParams* subpara)
 }
 
 /**
- * @brief æ¶ˆæ¯ä¸»é¢˜æ˜¯å¦ç›¸åŒ
+ * @brief ÏûÏ¢Ö÷ÌâÊÇ·ñÏàÍ¬
  *
  * @param topic_filter
  * @param topicName
@@ -113,15 +113,15 @@ static uint8_t _is_topic_equals(char *topic_filter, char *topicName) {
 
 
 /**
- * @brief æ¶ˆæ¯ä¸»é¢˜åŒ¹é…
+ * @brief ÏûÏ¢Ö÷ÌâÆ¥Åä
  *
  * assume topic filter and name is in correct format
  * # can only be at end
  * + and # can only be next to separator
  *
- * @param topic_filter   è®¢é˜…æ¶ˆæ¯çš„ä¸»é¢˜å
- * @param topicName     æ”¶åˆ°æ¶ˆæ¯çš„ä¸»é¢˜å, ä¸èƒ½åŒ…å«é€šé…ç¬¦
- * @param topicNameLen  ä¸»é¢˜åçš„é•¿åº¦
+ * @param topic_filter   ¶©ÔÄÏûÏ¢µÄÖ÷ÌâÃû
+ * @param topicName     ÊÕµ½ÏûÏ¢µÄÖ÷ÌâÃû, ²»ÄÜ°üº¬Í¨Åä·û
+ * @param topicNameLen  Ö÷ÌâÃûµÄ³¤¶È
  * @return
  */
 static uint8_t _is_topic_matched(char *topic_filter, char *topicName, uint16_t topicNameLen) {
@@ -171,24 +171,28 @@ static uint8_t _is_topic_matched(char *topic_filter, char *topicName, uint16_t t
 
 
 /**
- * @brief ç»ˆç«¯æ”¶åˆ°æœåŠ¡å™¨çš„çš„PUBLISHæ¶ˆæ¯ä¹‹åŽ, ä¼ é€’æ¶ˆæ¯ç»™æ¶ˆæ¯å›žè°ƒå¤„ç†å‡½æ•°
+ * @brief ÖÕ¶ËÊÕµ½·þÎñÆ÷µÄµÄPUBLISHÏûÏ¢Ö®ºó, ´«µÝÏûÏ¢¸øÏûÏ¢»Øµ÷´¦Àíº¯Êý
  *
- * @param data æ”¶åˆ°çš„æ¶ˆæ¯ 
- * egï¼š
+ * @param data ÊÕµ½µÄÏûÏ¢ 
+ * eg£º
  *+TCMQTTRCVPUB:"03UKNYBUZG/dev2/data",39,"{"action":"publish_test","count":"954"}"
  * 
- * @param size æ”¶åˆ°çš„æ¶ˆæ¯é•¿åº¦
+ * @param size ÊÕµ½µÄÏûÏ¢³¤¶È
  * @return @see eAtResault
  */
 eAtResault deliver_message(const char *data, uint32_t size)
 {
     POINTER_SANITY_CHECK(data, QCLOUD_ERR_NULL);
 	
-    int argc = 0;
+    uint8_t dup;
+    int qos;
+    uint8_t retained;
+    uint16_t packetid;
+    MQTTString topicName;
+    uint8_t *payload;
 	int	len = 0;
 	int i = 0;
 	bool matchFlag = false;
-    const char *req_expr = "+TCMQTTRCVPUB:%s,%u,%S";
     char topic_name[MAX_TOPIC_NAME_LEN+1] = {0};
     char topic_payload[MAX_TOPIC_PAYLOAD_LEN+1] = {0};
 	eAtResault Ret;
@@ -201,19 +205,35 @@ eAtResault deliver_message(const char *data, uint32_t size)
 	sg_mqtt_lock = true;
 	
 	/* parameters parsing */
-    argc = at_req_parse_args(data, req_expr, topic_name, &len, topic_payload);
-    if (argc != 3)
+    if(MQTTDeserialize_publish(&dup, &qos, &retained, &packetid, &topicName, &payload, &len, data, size) != 1)
     {
         Log_e("input msg format illegal");
-        Ret = QCLOUD_ERR_FAILURE;     
+        Ret = QCLOUD_ERR_FAILURE;
     }
     else
 	{
 		//Log_d("msg_topic:%s, len:%u, payload:%s", topic_name, len, topic_payload);
 	}
 
-	at_strip(topic_name, AT_CMD_DQUOTES_MARK);
-	at_strip(topic_payload, AT_CMD_DQUOTES_MARK);
+    if(topicName.lenstring.len < MAX_TOPIC_NAME_LEN)
+    {
+        memcpy(topic_name, topicName.lenstring.data, topicName.lenstring.len);
+    }
+    else
+    {
+        Log_e("topic name too long");
+        Ret = QCLOUD_ERR_FAILURE;
+    }
+
+    if(len < MAX_TOPIC_PAYLOAD_LEN)
+    {
+        memcpy(topic_payload, payload, len);
+    }
+    else
+    {
+        Log_e("topic payload too long");
+        Ret = QCLOUD_ERR_FAILURE;
+    }
 	
 	for (i = 0; i < QCLOUD_IOT_MAX_SUB_TOPIC; i++) 
 	{

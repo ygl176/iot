@@ -22,7 +22,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include "utils_timer.h"
-#include "at_utils.h"
 #include "data_template_client_json.h"
 #include "data_template_client.h"
 #include "qcloud_iot_api_export.h"
@@ -33,10 +32,28 @@ typedef void (*TraverseTemplateHandle)(Qcloud_IoT_Template *pTemplate, ListNode 
 static char sg_template_cloud_rcv_buf[CLOUD_IOT_JSON_RX_BUF_LEN];
 static char sg_template_clientToken[MAX_SIZE_OF_CLIENT_TOKEN];
 
+/**
+ * @brief É¾³ýÖ¸¶¨×Ö·û
+ *
+ * @param str Ä¿µÄ×Ö·û´®
+ * @param patten É¾³ý×Ö·û
+ */
+void chr_strip(char *str, const char patten)
+{
+	char *end = str + strlen(str);
 
+ 	while(*str != '\0')
+ 	{
+		if(*str == patten)
+		{
+			memmove(str, str+1, end - str);
+		}
+		str++;
+	}
+}
 
 /**
- * @brief å–æ¶ˆè®¢é˜…topic: $thing/down/property/{ProductId}/{DeviceName}
+ * @brief È¡Ïû¶©ÔÄtopic: $thing/down/property/{ProductId}/{DeviceName}
  */
 static int _unsubscribe_template_downstream_topic(void* pClient)
 {
@@ -44,7 +61,7 @@ static int _unsubscribe_template_downstream_topic(void* pClient)
     int rc = QCLOUD_RET_SUCCESS;
 
     char downstream_topic[MAX_SIZE_OF_CLOUD_TOPIC] = {0};
-    int size = HAL_Snprintf(downstream_topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/down/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);
+    int size = snprintf(downstream_topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/down/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);
 
     if (size < 0 || size > MAX_SIZE_OF_CLOUD_TOPIC - 1)
     {
@@ -155,12 +172,12 @@ char * get_control_clientToken(void){
 
 
 /**
- * @brief å‘å¸ƒæ–‡æ¡£è¯·æ±‚åˆ°ç‰©è”äº‘
+ * @brief ·¢²¼ÎÄµµÇëÇóµ½ÎïÁªÔÆ
  *
- * @param pClient                   Qcloud_IoT_Clientå¯¹è±¡
- * @param method                    æ–‡æ¡£æ“ä½œæ–¹å¼
- * @param pJsonDoc                  ç­‰å¾…å‘é€çš„æ–‡æ¡£
- * @return è¿”å›žQCLOUD_ERR_SUCCESS, è¡¨ç¤ºå‘å¸ƒæ–‡æ¡£è¯·æ±‚æˆåŠŸ
+ * @param pClient                   Qcloud_IoT_Client¶ÔÏó
+ * @param method                    ÎÄµµ²Ù×÷·½Ê½
+ * @param pJsonDoc                  µÈ´ý·¢ËÍµÄÎÄµµ
+ * @return ·µ»ØQCLOUD_ERR_SUCCESS, ±íÊ¾·¢²¼ÎÄµµÇëÇó³É¹¦
  */
 static int _publish_to_template_upstream_topic(Qcloud_IoT_Template *pTemplate, Method method, char *pJsonDoc)
 {
@@ -171,7 +188,7 @@ static int _publish_to_template_upstream_topic(Qcloud_IoT_Template *pTemplate, M
 	int size;
 		
 
-	size = HAL_Snprintf(topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/up/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);	
+	size = snprintf(topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/up/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);
 
 	if (size < 0 || size > MAX_SIZE_OF_CLOUD_TOPIC - 1)
     {
@@ -190,7 +207,7 @@ static int _publish_to_template_upstream_topic(Qcloud_IoT_Template *pTemplate, M
 }
 
 /**
- * @brief æ ¹æ®RequestParamsã€Methodæ¥ç»™jsonå¡«å…¥typeå­—æ®µçš„å€¼
+ * @brief ¸ù¾ÝRequestParams¡¢MethodÀ´¸øjsonÌîÈëtype×Ö¶ÎµÄÖµ
  */
 static int _set_template_json_type(char *pJsonDoc, size_t sizeOfBuffer, Method method)
 {
@@ -229,9 +246,9 @@ static int _set_template_json_type(char *pJsonDoc, size_t sizeOfBuffer, Method m
 
     char json_node_str[64] = {0};
 #ifdef QUOTES_TRANSFER_NEED	
-    HAL_Snprintf(json_node_str, 64, "\\\"method\\\":\\\"%s\\\""T_", ", method_str);
+    snprintf(json_node_str, 64, "\\\"method\\\":\\\"%s\\\""T_", ", method_str);
 #else
-	 HAL_Snprintf(json_node_str, 64, "\"method\":\"%s\", ", method_str);
+	 snprintf(json_node_str, 64, "\"method\":\"%s\", ", method_str);
 #endif
 
     size_t json_node_len = strlen(json_node_str);
@@ -245,7 +262,7 @@ static int _set_template_json_type(char *pJsonDoc, size_t sizeOfBuffer, Method m
 }
 
 /**
- * @brief éåŽ†åˆ—è¡¨, å¯¹åˆ—è¡¨æ¯ä¸ªèŠ‚ç‚¹éƒ½æ‰§è¡Œä¸€æ¬¡ä¼ å…¥çš„å‡½æ•°traverseHandle
+ * @brief ±éÀúÁÐ±í, ¶ÔÁÐ±íÃ¿¸ö½Úµã¶¼Ö´ÐÐÒ»´Î´«ÈëµÄº¯ÊýtraverseHandle
  */
 static void _traverse_template_list(Qcloud_IoT_Template *pTemplate, List *list, const char *pClientToken, const char *pType, TraverseTemplateHandle traverseHandle)
 {
@@ -283,7 +300,7 @@ static void _traverse_template_list(Qcloud_IoT_Template *pTemplate, List *list, 
 }
 
 /**
- * @brief æ‰§è¡Œè¿‡æœŸçš„è®¾å¤‡å½±å­æ“ä½œçš„å›žè°ƒå‡½æ•°
+ * @brief Ö´ÐÐ¹ýÆÚµÄÉè±¸Ó°×Ó²Ù×÷µÄ»Øµ÷º¯Êý
  */
 static void _handle_template_expired_reply_callback(Qcloud_IoT_Template *pTemplate, ListNode **node, List *list, const char *pClientToken, const char *pType)
 {
@@ -316,7 +333,7 @@ void handle_template_expired_reply(Qcloud_IoT_Template *pTemplate) {
 }
 
 /**
- * @brief å°†è®¾å¤‡å½±å­æ–‡æ¡£çš„æ“ä½œè¯·æ±‚ä¿å­˜åœ¨åˆ—è¡¨ä¸­
+ * @brief ½«Éè±¸Ó°×ÓÎÄµµµÄ²Ù×÷ÇëÇó±£´æÔÚÁÐ±íÖÐ
  */
 static int _add_request_to_template_list(Qcloud_IoT_Template *pTemplate, const char *pClientToken, RequestParams *pParams)
 {
@@ -378,7 +395,7 @@ int send_template_request(Qcloud_IoT_Template *pTemplate, RequestParams *pParams
 	tempBuff[strlen(pJsonDoc)] = '\0';
 	chr_strip(tempBuff, '\\');
 
-    // è§£æžæ–‡æ¡£ä¸­çš„clientToken, å¦‚æžœè§£æžå¤±è´¥, ç›´æŽ¥è¿”å›žé”™è¯¯
+    // ½âÎöÎÄµµÖÐµÄclientToken, Èç¹û½âÎöÊ§°Ü, Ö±½Ó·µ»Ø´íÎó
     if (!parse_client_token(tempBuff, &client_token))
     {
         Log_e("fail to parse client token!");
@@ -395,7 +412,7 @@ int send_template_request(Qcloud_IoT_Template *pTemplate, RequestParams *pParams
         IOT_FUNC_EXIT_RC(rc);
 
 	Log_d("Report Doc:%s", pJsonDoc);
-    // ç›¸åº”çš„ report topic è®¢é˜…æˆåŠŸæˆ–å·²ç»è®¢é˜…
+    // ÏàÓ¦µÄ report topic ¶©ÔÄ³É¹¦»òÒÑ¾­¶©ÔÄ
     if (rc == QCLOUD_RET_SUCCESS) {
         rc = _publish_to_template_upstream_topic(pTemplate, pParams->method, pJsonDoc);
     }
@@ -413,9 +430,9 @@ int send_template_request(Qcloud_IoT_Template *pTemplate, RequestParams *pParams
 }
 
 /**
- * @brief å¤„ç†æ³¨å†Œå±žæ€§çš„å›žè°ƒå‡½æ•°
- * å½“è®¢é˜…çš„$thing/down/property/{ProductId}/{DeviceName}è¿”å›žæ¶ˆæ¯æ—¶ï¼Œ
- * è‹¥å¯¹åº”çš„methodä¸ºcontrolæˆ–è€…getçš„æ•°æ®æœ‰control, åˆ™æ‰§è¡Œè¯¥å‡½æ•°
+ * @brief ´¦Àí×¢²áÊôÐÔµÄ»Øµ÷º¯Êý
+ * µ±¶©ÔÄµÄ$thing/down/property/{ProductId}/{DeviceName}·µ»ØÏûÏ¢Ê±£¬
+ * Èô¶ÔÓ¦µÄmethodÎªcontrol»òÕßgetµÄÊý¾ÝÓÐcontrol, ÔòÖ´ÐÐ¸Ãº¯Êý
  * 
  */
 static void _handle_control(Qcloud_IoT_Template *pTemplate, char* control_str)
@@ -465,7 +482,7 @@ static void _handle_control(Qcloud_IoT_Template *pTemplate, char* control_str)
 
 
 /**
- * @brief æ‰§è¡Œæ•°æ®æ¨¡æ¿æ“ä½œçš„å›žè°ƒå‡½æ•°
+ * @brief Ö´ÐÐÊý¾ÝÄ£°å²Ù×÷µÄ»Øµ÷º¯Êý
  */
 static void _handle_template_reply_callback(Qcloud_IoT_Template *pTemplate, ListNode **node, List *list, const char *pClientToken, const char *pType)
 {
@@ -481,7 +498,7 @@ static void _handle_template_reply_callback(Qcloud_IoT_Template *pTemplate, List
     {
         RequestAck status = ACK_NONE;
 
-        // é€šè¿‡å›žå¤åŒ…çš„ code æ¥ç¡®å®šå¯¹åº”çš„æ“ä½œæ˜¯å¦æˆåŠŸï¼Œ0ï¼šæˆåŠŸï¼Œ 1ï¼šå¤±è´¥
+        // Í¨¹ý»Ø¸´°üµÄ code À´È·¶¨¶ÔÓ¦µÄ²Ù×÷ÊÇ·ñ³É¹¦£¬0£º³É¹¦£¬ 1£ºÊ§°Ü
         int32_t reply_code = 0;
         
         bool parse_success = parse_code_return(sg_template_cloud_rcv_buf, &reply_code);
@@ -522,9 +539,9 @@ static void _handle_template_reply_callback(Qcloud_IoT_Template *pTemplate, List
 
 
 /**
- * @brief æ–‡æ¡£æ“ä½œè¯·æ±‚ç»“æžœçš„å›žè°ƒå‡½æ•°
- * å®¢æˆ·ç«¯å…ˆè®¢é˜… $thing/down/property/{ProductId}/{DeviceName}, æ”¶åˆ°è¯¥topicçš„æ¶ˆæ¯åˆ™ä¼šè°ƒç”¨è¯¥å›žè°ƒå‡½æ•°
- * åœ¨è¿™ä¸ªå›žè°ƒå‡½æ•°ä¸­, è§£æžå‡ºå„ä¸ªè®¾å¤‡å½±å­æ–‡æ¡£æ“ä½œçš„ç»“æžœ
+ * @brief ÎÄµµ²Ù×÷ÇëÇó½á¹ûµÄ»Øµ÷º¯Êý
+ * ¿Í»§¶ËÏÈ¶©ÔÄ $thing/down/property/{ProductId}/{DeviceName}, ÊÕµ½¸ÃtopicµÄÏûÏ¢Ôò»áµ÷ÓÃ¸Ã»Øµ÷º¯Êý
+ * ÔÚÕâ¸ö»Øµ÷º¯ÊýÖÐ, ½âÎö³ö¸÷¸öÉè±¸Ó°×ÓÎÄµµ²Ù×÷µÄ½á¹û
  */
 static void _on_template_downstream_topic_handler(char *msg, void *context)
 {
@@ -540,20 +557,20 @@ static void _on_template_downstream_topic_handler(char *msg, void *context)
     sg_template_cloud_rcv_buf[cloud_rcv_len] = '\0';    // jsmn_parse relies on a string
 	//Log_d("recv:%s", sg_template_cloud_rcv_buf);
 
-	//è§£æžæ•°æ®æ¨¡æ¿ $thing/down/property ä¸‹è¡Œæ¶ˆæ¯ç±»åž‹
+	//½âÎöÊý¾ÝÄ£°å $thing/down/property ÏÂÐÐÏûÏ¢ÀàÐÍ
     if (!parse_template_method_type(sg_template_cloud_rcv_buf, &method_str))
     {
         Log_e("Fail to parse method!");
         goto End;
     }
 
-	//æ‰¾åˆ°å¯¹åº”çš„client_token
+	//ÕÒµ½¶ÔÓ¦µÄclient_token
     if (!parse_client_token(sg_template_cloud_rcv_buf, &client_token)) {
 		Log_e("Fail to parse client token! Json=%s", sg_template_cloud_rcv_buf);
 		goto End;
     }
 	
-	//å¤„ç†control æ¶ˆæ¯
+	//´¦Àícontrol ÏûÏ¢
     if (!strcmp(method_str, CONTROL_CMD)) {
 	    HAL_MutexLock(template_client->mutex);
 	    char* control_str = NULL;
@@ -594,7 +611,7 @@ int subscribe_template_downstream_topic(Qcloud_IoT_Template *pTemplate)
 		}
 		memset(downstream_topic, 0x0, MAX_SIZE_OF_CLOUD_TOPIC);
 
-		size = HAL_Snprintf(downstream_topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/down/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);				
+		size = snprintf(downstream_topic, MAX_SIZE_OF_CLOUD_TOPIC, "$thing/down/property/%s/%s", iot_device_info_get()->product_id, iot_device_info_get()->device_name);
 		if (size < 0 || size > MAX_SIZE_OF_CLOUD_TOPIC - 1)
 		{
 			Log_e("buf size < topic length!");

@@ -33,7 +33,9 @@
 #endif
 
 #include "lite-list.h"
-#include "hal_export.h"
+// #include "hal_export.h"
+#include "common.h"
+#include "config.h"
 
 #define LITE_TRUE                   (1)
 #define LITE_FALSE                  (0)
