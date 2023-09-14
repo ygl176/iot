@@ -100,7 +100,7 @@ typedef struct
     char *recv;                 //消息处理缓冲区
     uint32_t recv_len;
     uint32_t cur_recv_len;
-    bool recv_notice;
+    bool recv_notice;           //串口消息指示
 
     void *lock;                 //互斥信号量
 

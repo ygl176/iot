@@ -205,7 +205,7 @@ eAtResault deliver_message(const char *data, uint32_t size)
 	sg_mqtt_lock = true;
 	
 	/* parameters parsing */
-    if(MQTTDeserialize_publish(&dup, &qos, &retained, &packetid, &topicName, &payload, &len, data, size) != 1)
+    if(MQTTDeserialize_publish(&dup, &qos, &retained, &packetid, &topicName, &payload, &len, (uint8_t*)data, size) != 1)
     {
         Log_e("input msg format illegal");
         Ret = QCLOUD_ERR_FAILURE;

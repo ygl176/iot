@@ -22,7 +22,7 @@
 
 #define 	QCLOUD_IOT_MAX_SUB_TOPIC 								(5)		//最多可订阅topic数
 #define 	MAX_TOPIC_NAME_LEN     									(138)	//topic名最长长度
-#define 	MAX_TOPIC_PAYLOAD_LEN   								(1024)  //topic 最长payload
+#define 	MAX_TOPIC_PAYLOAD_LEN   								(200)  //topic 最长payload
 
 /* 设备ID的最大长度, 必须保持唯一 */
 #define 	MAX_SIZE_OF_CLIENT_ID                                   (80)

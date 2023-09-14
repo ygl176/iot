@@ -116,7 +116,7 @@ bool mqtt_connect(uint8_t* client_id, uint8_t* device_name, uint8_t* device_key,
 
     uint8_t sessionPresent,connack_rc;
 
-    if(MQTTDeserialize_connack(&sessionPresent, &connack_rc, mqtt_buff, MQTT_MAX_BUFF) != 1 || connack_rc != 0)
+    if(MQTTDeserialize_connack(&sessionPresent, &connack_rc, (uint8_t*)resp->buf, MQTT_MAX_BUFF) != 1 || connack_rc != 0)
     {
         Log_e("mqtt connect ack failed");
         ret = false;
@@ -205,10 +205,10 @@ bool mqtt_subscribe(uint8_t* sub_topic, uint16_t req_qos, uint16_t msgid)
     }
 
     uint16_t subid;
-    uint16_t sub_count;
-    uint8_t qos;
+    int sub_count;
+    int qos;
 
-    uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, mqtt_buff, MQTT_MAX_BUFF);
+    uint8_t rc = MQTTDeserialize_suback(&subid, 1, &sub_count, &qos, (uint8_t*)resp->buf, MQTT_MAX_BUFF);
 
     if(!rc || subid != msgid || qos == 0x80)
         ret = false;
@@ -261,7 +261,7 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
 
     uint16_t unsub_id;
 
-    uint8_t rc = MQTTDeserialize_unsuback(&unsub_id, mqtt_buff, MQTT_MAX_BUFF);
+    uint8_t rc = MQTTDeserialize_unsuback(&unsub_id, (uint8_t*)resp->buf, MQTT_MAX_BUFF);
 
     if(!rc || unsub_id != msgid)
         ret = false;
@@ -286,7 +286,7 @@ bool mqtt_unsubscribe(uint8_t* unsub_topic, uint16_t msgid)
  */
 bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload)
 {
-    bool ret;
+    bool ret = true;
     MQTTString topicName = MQTTString_initializer;
     response_t resp = mqtt_get_resp();
 

@@ -21,16 +21,12 @@
 #include "bsp_at_esp8266.h"
 
 
-#define TOTAL_PROPERTY_COUNT 5
+#define TOTAL_PROPERTY_COUNT 1
 
 static sDataPoint    sg_DataTemplate[TOTAL_PROPERTY_COUNT];
 
 typedef struct _ProductDataDefine {
     TYPE_DEF_TEMPLATE_ENUM m_led;
-    TYPE_DEF_TEMPLATE_BOOL m_power_switch;
-    TYPE_DEF_TEMPLATE_FLOAT m_tempreture;
-    TYPE_DEF_TEMPLATE_FLOAT m_humidity;
-    TYPE_DEF_TEMPLATE_INT m_brightness;
 } ProductDataDefine;
 
 static   ProductDataDefine     sg_ProductData;
@@ -41,26 +37,6 @@ static void _init_data_template(void)
     sg_DataTemplate[0].data_property.data = &sg_ProductData.m_led;
     sg_DataTemplate[0].data_property.key  = "led";
     sg_DataTemplate[0].data_property.type = TYPE_TEMPLATE_ENUM;
-
-    sg_ProductData.m_power_switch = 0;
-    sg_DataTemplate[1].data_property.data = &sg_ProductData.m_power_switch;
-    sg_DataTemplate[1].data_property.key  = "power_switch";
-    sg_DataTemplate[1].data_property.type = TYPE_TEMPLATE_BOOL;
-
-    sg_ProductData.m_tempreture = 0;
-    sg_DataTemplate[2].data_property.data = &sg_ProductData.m_tempreture;
-    sg_DataTemplate[2].data_property.key  = "tempreture";
-    sg_DataTemplate[2].data_property.type = TYPE_TEMPLATE_FLOAT;
-
-    sg_ProductData.m_humidity = 0;
-    sg_DataTemplate[3].data_property.data = &sg_ProductData.m_humidity;
-    sg_DataTemplate[3].data_property.key  = "humidity";
-    sg_DataTemplate[3].data_property.type = TYPE_TEMPLATE_FLOAT;
-
-    sg_ProductData.m_brightness = 0;
-    sg_DataTemplate[4].data_property.data = &sg_ProductData.m_brightness;
-    sg_DataTemplate[4].data_property.key  = "brightness";
-    sg_DataTemplate[4].data_property.type = TYPE_TEMPLATE_INT;
 
 };
 
@@ -261,13 +237,13 @@ static void OnReportReplyCallback(void *pClient, Method method, ReplyAck replyAc
 
 static void cycle_report_info(Timer *pTimer,ProductDataDefine *pWorkshop)
 {
-	char showstr[64];
+//	char showstr[64];
 	
 	/*只读数据定时巡检上报*/
 	if(expired(pTimer)){
 		
 		// HumAndTempRead(TEMP_READ, &sg_ProductData.m_tempreture);
-		// set_propery_changed( &sg_ProductData.m_tempreture);
+		// set_propery_changed( &sg_ProductData.m_led);
 
 		// HumAndTempRead(HUM_READ, &sg_ProductData.m_humidity);
 		// set_propery_changed( &sg_ProductData.m_humidity);
@@ -298,7 +274,6 @@ static void deal_down_stream_user_logic(void *pClient, ProductDataDefine  *pWork
 	char showstr[256];
 	memset(showstr, 0, 256);
 	snprintf(showstr, 256, "color red");
-	Log_d("color:%d, motor: %d", pWorkshop->m_led, pWorkshop->m_power_switch);
 	
 	/*灯光颜色*/
 	switch(pWorkshop->m_led) {
@@ -323,22 +298,6 @@ static void deal_down_stream_user_logic(void *pClient, ProductDataDefine  *pWork
 	        snprintf(showstr, 256, "led off");
 	        break;
 	}
-	// OledShowString(0, &g_PosRow, showstr, CHAR_WID_8, false); 
-	
-	memset(showstr, 0, 256);
-	if(pWorkshop->m_power_switch  > 0){
-        /* motor on */
-		Log_d("motor on");
-		snprintf(showstr, 256, "motor on");
-		// MotorControl(FORWORD_ON);
-	}else{
-		/* motor off */
-		Log_d("motor off");
-		snprintf(showstr, 256, "motor off");
-		// MotorControl(MOTOR_OFF);
-	}
-	// OledShowString(0, &g_PosRow, showstr, CHAR_WID_8, false); 
-	
 #ifdef EVENT_POST_ENABLED
 	if(eCHANGED == sg_DataTemplate[1].state){
 		if(pWorkshop->m_power_switch > 0){	
@@ -374,64 +333,64 @@ static int deal_up_stream_user_logic(DeviceProperty *pReportDataList[], int *pCo
 }
 
 
-static eAtResault net_prepare(void)
-{
-	eAtResault Ret;
-	DeviceInfo sDevInfo;
-	// at_client_t pclient = at_client_get();	
+// static eAtResault net_prepare(void)
+// {
+// 	eAtResault Ret;
+// 	DeviceInfo sDevInfo;
+// 	// at_client_t pclient = at_client_get();	
 
-	memset((char *)&sDevInfo, '\0', sizeof(DeviceInfo));
-	Ret = (eAtResault)HAL_GetDevInfo(&sDevInfo);
-	if(QCLOUD_RET_SUCCESS != Ret){
-		Log_e("Get device info err");
-		return QCLOUD_ERR_FAILURE;
-	}
+// 	memset((char *)&sDevInfo, '\0', sizeof(DeviceInfo));
+// 	Ret = (eAtResault)HAL_GetDevInfo(&sDevInfo);
+// 	if(QCLOUD_RET_SUCCESS != Ret){
+// 		Log_e("Get device info err");
+// 		return QCLOUD_ERR_FAILURE;
+// 	}
 	
-	if(QCLOUD_RET_SUCCESS != module_init(eMODULE_L206D)) 
-	{
-		Log_e("module init failed");
-		goto exit;
-	}
-	else
-	{
-		Log_d("module init success");	
-	}
+// 	if(QCLOUD_RET_SUCCESS != module_init(eMODULE_L206D)) 
+// 	{
+// 		Log_e("module init failed");
+// 		goto exit;
+// 	}
+// 	else
+// 	{
+// 		Log_d("module init success");	
+// 	}
 
-	/*at_parse thread should work first*/
-	// while(AT_STATUS_INITIALIZED != pclient->status)
-	// {	
-		// HAL_SleepMs(1000);
-	// }
+// 	/*at_parse thread should work first*/
+// 	// while(AT_STATUS_INITIALIZED != pclient->status)
+// 	// {	
+// 		// HAL_SleepMs(1000);
+// 	// }
 	
-	Log_d("Start shakehands with module...");
-	// Ret = module_handshake(CMD_TIMEOUT_MS);
-	if(QCLOUD_RET_SUCCESS != Ret)
-	{
-		Log_e("module connect fail,Ret:%d", Ret);
-		goto exit;
-	}
-	else
-	{
-		Log_d("module connect success");
-	}
+// 	Log_d("Start shakehands with module...");
+// 	// Ret = module_handshake(CMD_TIMEOUT_MS);
+// 	if(QCLOUD_RET_SUCCESS != Ret)
+// 	{
+// 		Log_e("module connect fail,Ret:%d", Ret);
+// 		goto exit;
+// 	}
+// 	else
+// 	{
+// 		Log_d("module connect success");
+// 	}
 	
-	Ret = iot_device_info_init(sDevInfo.product_id, sDevInfo.device_name, sDevInfo.devSerc);
-	if(QCLOUD_RET_SUCCESS != Ret)
-	{
-		Log_e("dev info init fail,Ret:%d", Ret);
-		goto exit;
-	}
+// 	Ret = iot_device_info_init(sDevInfo.product_id, sDevInfo.device_name, sDevInfo.devSerc);
+// 	if(QCLOUD_RET_SUCCESS != Ret)
+// 	{
+// 		Log_e("dev info init fail,Ret:%d", Ret);
+// 		goto exit;
+// 	}
 
-	Ret = module_info_set(iot_device_info_get(), ePSK_TLS);
-	if(QCLOUD_RET_SUCCESS != Ret)
-	{
-		Log_e("module info set fail,Ret:%d", Ret);
-	}
+// 	Ret = module_info_set(iot_device_info_get(), ePSK_TLS);
+// 	if(QCLOUD_RET_SUCCESS != Ret)
+// 	{
+// 		Log_e("module info set fail,Ret:%d", Ret);
+// 	}
 
-exit:
+// exit:
 
-	return Ret;
-}
+// 	return Ret;
+// }
 
 static void eventPostCheck(void *client)
 {
@@ -477,10 +436,10 @@ static int _get_sys_info(void *handle, char *pJsonDoc, size_t sizeOfBuffer)
     DeviceProperty plat_info[] = {
      	{.key = "module_hardinfo", .type = TYPE_TEMPLATE_STRING, .data = "ESP8266"},
      	{.key = "module_softinfo", .type = TYPE_TEMPLATE_STRING, .data = "V1.0"},
-     	{.key = "fw_ver", 		   .type = TYPE_TEMPLATE_STRING, .data = QCLOUD_IOT_AT_SDK_VERSION},
-     	{.key = "imei", 		   .type = TYPE_TEMPLATE_STRING, .data = "11-22-33-44"},
-     	{.key = "lat", 			   .type = TYPE_TEMPLATE_STRING, .data = "22.546015"},
-     	{.key = "lon", 			   .type = TYPE_TEMPLATE_STRING, .data = "113.941125"},
+     	// {.key = "fw_ver", 		   .type = TYPE_TEMPLATE_STRING, .data = QCLOUD_IOT_AT_SDK_VERSION},
+     	// {.key = "imei", 		   .type = TYPE_TEMPLATE_STRING, .data = "11-22-33-44"},
+     	// {.key = "lat", 			   .type = TYPE_TEMPLATE_STRING, .data = "22.546015"},
+     	// {.key = "lon", 			   .type = TYPE_TEMPLATE_STRING, .data = "113.941125"},
         {NULL, NULL, JINT32}  //结束
 	};
 		
@@ -513,6 +472,12 @@ void data_template_demo_task(void *arg)
 		else
 		{
 			Log_e("esp init err");
+			break;
+		} 
+
+		if(iot_device_info_init("VOIXMXT1OK", "esp", "wgXg1LBb6qPAV1cwikaFzQ==") != QCLOUD_RET_SUCCESS)
+		{
+			Log_e("device info init failed");
 			break;
 		}
 
@@ -662,7 +627,7 @@ void data_template_demo_task(void *arg)
 				}
 			}			
 			eventPostCheck(client);
-		}				
+		}
 	}while (0);
 		
 	Log_e("Task teminated,Something goes wrong!!!");
@@ -675,7 +640,7 @@ void data_template_sample(void)
 	osThreadId demo_threadId;
 	
 #ifdef OS_USED
-	hal_thread_create(&demo_threadId, 1024, osPriorityNormal, data_template_demo_task, NULL);
+	hal_thread_create(&demo_threadId, 2048, osPriorityNormal, data_template_demo_task, NULL);
 	hal_thread_destroy(NULL);
 #else
 	#error os should be used just now

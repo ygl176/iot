@@ -90,7 +90,7 @@ void IOT_Template_Message_Arrived_CallBack(const char *data, int size)
 	POINTER_SANITY_CHECK_RTN(node->data);
 	
 	node->size = size;
-	strncpy(node->data, data, size);
+	memcpy(node->data, data, size);
 	node->data[size] = '\0';
 	
 	list_lpush(template_client->inner_data.pMsgList, list_node_new(node)); //∑≈»Î«Î«Û
@@ -706,7 +706,7 @@ void IOT_Template_Yield(void *handle, uint32_t timeout_ms)
 	handle_template_expired_event((Qcloud_IoT_Template *)handle);
 #endif
 
-	HAL_SleepMs(1);
+	HAL_Delay(1);
 }
 
 

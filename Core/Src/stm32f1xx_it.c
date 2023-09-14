@@ -256,7 +256,7 @@ void USART1_IRQHandler(void)
   else if(__HAL_UART_GET_FLAG(&huart1, USART_SR_IDLE))
   {
 	  ch = (uint8_t)READ_REG(huart1.Instance->DR) & 0xff;
-    if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, (uint8_t*)"\n", 1))
+    if(RINGBUFF_OK != ring_buff_push_data(&esp_ring_buff, (uint8_t*)"\0", 1))
     {
 	      Log_e("ring buff push err");
     }
@@ -264,7 +264,7 @@ void USART1_IRQHandler(void)
     {
 	      HAL_SemaphoreRelease(p_esp->sema_rx);
     }
-	  ch = '\0';
+	  ch = '\n';
 	  p_esp->recv_notice = true;
   }
   else
@@ -281,7 +281,7 @@ void USART1_IRQHandler(void)
 	    HAL_SemaphoreRelease(p_esp->sema_rx);
   }
   /* USER CODE END USART1_IRQn 0 */
-  HAL_UART_IRQHandler(&huart1);
+//  HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
 
   /* USER CODE END USART1_IRQn 1 */

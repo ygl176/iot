@@ -622,7 +622,7 @@ char* ESP8266_RecStr();
 
 static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
 {
-    uint32_t read_len = 0;
+    uint16_t read_len = 0;
     uint8_t ch = 0;
     bool is_full = false;
     memset(p_esp->recv, 0x00, p_esp->recv_len);
@@ -646,7 +646,7 @@ static bool esp_recv_ReadMessage(tbsp_esp8266 p_esp)
             is_full = true;
         }
 
-        if(p_esp->recv_notice && ch == '\0' && p_esp->recv[read_len - 2] == '\n')
+        if(p_esp->recv_notice && ch == '\n' && p_esp->recv[read_len - 2] == '\0')
         {
             p_esp->recv_notice = false;
             if(is_full)
@@ -680,13 +680,13 @@ void esp_parse(void *arg)
             {
                 recv_type = (p_esp->recv[0]) >> 4;
                 //待替换非主动请求检测
-                if(recv_type == 3)//接收报文为publish
+                if(recv_type == PUBLISH)//接收报文为publish
                 {
                     IOT_Template_Message_Arrived_CallBack(p_esp->recv, p_esp->cur_recv_len);
                 }
                 else if(p_esp->resp != NULL) //mqtt主动请求
                 {
-                    if(recv_type == 2 || recv_type == 9 || recv_type == 11 || recv_type == 13)
+                    if(recv_type == CONNACK || recv_type == SUBACK || recv_type == UNSUBACK || recv_type == PINGRESP)
                     {
                         memcpy(p_esp->resp->buf, p_esp->recv, p_esp->cur_recv_len);
                         p_esp->resp->buf_num = p_esp->cur_recv_len;

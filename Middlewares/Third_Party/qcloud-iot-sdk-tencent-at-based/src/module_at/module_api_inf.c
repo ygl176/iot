@@ -24,7 +24,7 @@ static uint16_t msg_id;
 /* mqtt setup connect */
 eAtResault module_mqtt_conn(MQTTInitParams init_params)
 {
-	if(!mqtt_connect(CLIENT_ID, DEVICE_NAME, DEVICE_KEY, 120))
+	if(!mqtt_connect((uint8_t*)CLIENT_ID, (uint8_t*)DEVICE_NAME, (uint8_t*)DEVICE_KEY, 120))
 	{
 		Log_e("cmd mqtt_connect exec err");
 		return QCLOUD_ERR_FAILURE;
@@ -44,10 +44,10 @@ eAtResault module_mqtt_pub(const char *topic, QoS eQos, char *payload)
 {
 	eAtResault result = QCLOUD_RET_SUCCESS;
 
-	if(strlen(payload) > 1000){
+	if(strlen(payload) > 200){
 		Log_e("payload too long");
 	}else{
-		if(!mqtt_publish(topic, payload))//只支持 Qos0, Qos1待实现
+		if(!mqtt_publish((uint8_t*)topic, (uint8_t*)payload))//只支持 Qos0, Qos1待实现
 		{
 			Log_e("cmd mqtt_publish exec err");
 			result = QCLOUD_ERR_FAILURE;
@@ -107,7 +107,7 @@ eAtResault module_mqtt_sub(char *topic, QoS eQos, OnMessageHandler cb, void *con
 		return result;
 	}
 
-	if(!mqtt_subscribe(topic, eQos, msg_id++))
+	if(!mqtt_subscribe((uint8_t*)topic, eQos, msg_id++))
 	{
 		Log_e("cmd mqtt_subscribe exec err");
 		result = QCLOUD_ERR_FAILURE;
@@ -122,7 +122,7 @@ eAtResault module_mqtt_sub(char *topic, QoS eQos, OnMessageHandler cb, void *con
 
 eAtResault module_mqtt_unsub(const char *topic)
 {
-	if(!mqtt_unsubscribe(topic, msg_id++))		
+	if(!mqtt_unsubscribe((uint8_t*)topic, msg_id++))
 	{
 		Log_e("send unsub msg err");
 		return QCLOUD_ERR_FAILURE;
@@ -143,6 +143,7 @@ eAtResault module_mqtt_state(eMqtt_State *pState)
 
 bool IOT_MQTT_IsConnected(void) 
 {
+	HAL_Delay(1000);
 	return mqtt_ping();
 }
 
