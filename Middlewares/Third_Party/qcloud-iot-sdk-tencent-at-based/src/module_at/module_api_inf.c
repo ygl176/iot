@@ -23,6 +23,7 @@ static uint16_t msg_id;
 
 static bool mqtt_connect_flag = true;
 
+
 static bool get_mqtt_connect_flag()
 {
 	return mqtt_connect_flag;
@@ -50,6 +51,10 @@ void mqtt_connect_check()
 			{
 				set_mqtt_connect_flag(false);
 			}
+		}
+		else
+		{
+			last_flag = true;
 		}
 	}
 }
