@@ -21,6 +21,39 @@
 
 static uint16_t msg_id;
 
+static bool mqtt_connect_flag = true;
+
+static bool get_mqtt_connect_flag()
+{
+	return mqtt_connect_flag;
+}
+
+static void set_mqtt_connect_flag(bool flag)
+{
+	mqtt_connect_flag = flag;
+}
+
+void mqtt_connect_check()
+{
+	static bool last_flag = true;
+
+	while(1)
+	{
+		osDelay(60000);
+		if(!mqtt_ping())
+		{
+			if(last_flag)
+			{
+				last_flag = false;
+			}
+			else
+			{
+				set_mqtt_connect_flag(false);
+			}
+		}
+	}
+}
+
 /* mqtt setup connect */
 eAtResault module_mqtt_conn(MQTTInitParams init_params)
 {
@@ -37,6 +70,8 @@ eAtResault module_mqtt_conn(MQTTInitParams init_params)
 eAtResault module_mqtt_discon(void)
 {
 	mqtt_disconnect();
+
+	return QCLOUD_RET_SUCCESS;
 }
 
 /* mqtt pub msg */
@@ -143,8 +178,7 @@ eAtResault module_mqtt_state(eMqtt_State *pState)
 
 bool IOT_MQTT_IsConnected(void) 
 {
-	HAL_Delay(1000);
-	return mqtt_ping();
+	return get_mqtt_connect_flag();
 }
 
 // /*

@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  */
+#include "main.h"
 #include "qcloud_iot_api_export.h"
 #include "lite-utils.h"
 // #include "at_client.h"
@@ -26,17 +27,17 @@
 static sDataPoint    sg_DataTemplate[TOTAL_PROPERTY_COUNT];
 
 typedef struct _ProductDataDefine {
-    TYPE_DEF_TEMPLATE_ENUM m_led;
+    TYPE_DEF_TEMPLATE_BOOL m_led;
 } ProductDataDefine;
 
 static   ProductDataDefine     sg_ProductData;
 
 static void _init_data_template(void)
 {
-    sg_ProductData.m_led = 1;
+    sg_ProductData.m_led = false;
     sg_DataTemplate[0].data_property.data = &sg_ProductData.m_led;
     sg_DataTemplate[0].data_property.key  = "led";
-    sg_DataTemplate[0].data_property.type = TYPE_TEMPLATE_ENUM;
+    sg_DataTemplate[0].data_property.type = TYPE_TEMPLATE_BOOL;
 
 };
 
@@ -237,32 +238,15 @@ static void OnReportReplyCallback(void *pClient, Method method, ReplyAck replyAc
 
 static void cycle_report_info(Timer *pTimer,ProductDataDefine *pWorkshop)
 {
-//	char showstr[64];
 	
 	/*只读数据定时巡检上报*/
 	if(expired(pTimer)){
-		
-		// HumAndTempRead(TEMP_READ, &sg_ProductData.m_tempreture);
-		// set_propery_changed( &sg_ProductData.m_led);
+		// mqtt_connect_check();
 
-		// HumAndTempRead(HUM_READ, &sg_ProductData.m_humidity);
-		// set_propery_changed( &sg_ProductData.m_humidity);
+		set_propery_changed(&sg_ProductData.m_led);
 
-		// GetLumen((uint32_t *)&sg_ProductData.m_brightness);
-		// set_propery_changed( &sg_ProductData.m_brightness);
-			
-		// Log_d("Brightness:%d, Temp:%f, Hum:%f",sg_ProductData.m_brightness, sg_ProductData.m_tempreture, sg_ProductData.m_humidity);
-		// countdown_ms(pTimer, CYCLE_TIME_MS);
-
-		// memset(showstr, 0, 64);
-		// HAL_Snprintf(showstr, 64, "Brightness:%d", sg_ProductData.m_brightness);
-		// OledShowString(0, &g_PosRow, showstr, CHAR_WID_8, false); 
-		// memset(showstr, 0, 64);
-		// HAL_Snprintf(showstr, 64, "Temp:%f", sg_ProductData.m_tempreture);
-		// OledShowString(0, &g_PosRow, showstr, CHAR_WID_8, false); 
-		// memset(showstr, 0, 64);
-		// HAL_Snprintf(showstr, 64, "Hum:%f", sg_ProductData.m_humidity);
-		// OledShowString(0, &g_PosRow, showstr, CHAR_WID_8, false); 
+		Log_d("LED: %d", sg_ProductData.m_led);
+		countdown_ms(pTimer, CYCLE_TIME_MS);
 	}
 	
 }
@@ -271,33 +255,15 @@ static void cycle_report_info(Timer *pTimer,ProductDataDefine *pWorkshop)
 /*用户需要实现的下行数据的业务逻辑,待用户实现*/
 static void deal_down_stream_user_logic(void *pClient, ProductDataDefine  *pWorkshop)
 {
-	char showstr[256];
-	memset(showstr, 0, 256);
-	snprintf(showstr, 256, "color red");
-	
-	/*灯光颜色*/
-	switch(pWorkshop->m_led) {
-	    case 0: //red
-//	        GrayDataSend(255, 0, 0);
-	    	snprintf(showstr, 256, "color Red");
-	        break;
-	    case 1: //green
-//	        GrayDataSend(0, 255, 0);
-	    	snprintf(showstr, 256, "color Green");
-	        break;
-	    case 2: //blue
-//	        GrayDataSend(0, 0, 255);
-	        snprintf(showstr, 256, "color Blue");
-	        break;
-		case 3: //off
-//	        GrayDataSend(0, 0, 0);
-	        snprintf(showstr, 256, "color Blue");
-	        break;	
-	    default:
-//	        GrayDataSend(0, 0, 0);
-	        snprintf(showstr, 256, "led off");
-	        break;
+	if(pWorkshop->m_led)
+	{
+		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 	}
+	else
+	{
+		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+	}
+
 #ifdef EVENT_POST_ENABLED
 	if(eCHANGED == sg_DataTemplate[1].state){
 		if(pWorkshop->m_power_switch > 0){	
@@ -508,6 +474,10 @@ void data_template_demo_task(void *arg)
 			Log_e("mqtt connect fail");
 			break;
 		}
+
+		osThreadId con_threadId;
+
+		hal_thread_create(&con_threadId, 256, osPriorityNormal, mqtt_connect_check, NULL);
 
 		Ret = (eAtResault)IOT_Template_Construct(&client);
 		if(QCLOUD_RET_SUCCESS != Ret)

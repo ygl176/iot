@@ -555,7 +555,7 @@ static void _on_template_downstream_topic_handler(char *msg, void *context)
     int cloud_rcv_len = min(CLOUD_IOT_JSON_RX_BUF_LEN - 1, strlen(msg));
     memcpy(sg_template_cloud_rcv_buf, msg, cloud_rcv_len + 1);
     sg_template_cloud_rcv_buf[cloud_rcv_len] = '\0';    // jsmn_parse relies on a string
-	//Log_d("recv:%s", sg_template_cloud_rcv_buf);
+	Log_d("recv:%s", sg_template_cloud_rcv_buf);
 
 	//解析数据模板 $thing/down/property 下行消息类型
     if (!parse_template_method_type(sg_template_cloud_rcv_buf, &method_str))

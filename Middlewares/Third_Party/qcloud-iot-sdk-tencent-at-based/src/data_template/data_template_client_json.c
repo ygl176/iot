@@ -153,7 +153,7 @@ int put_json_node(char *jsonBuffer, size_t sizeOfBuffer, const char *pKey, void 
                                       ""T_",", *(int16_t *) (pData));
         } else if (type == JINT8) {
             rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "%"
-                                      PRIi8
+                                      "d"//PRIi8
                                       ""T_",", *(int8_t *) (pData));
         } else if (type == JUINT32) {
             rc_of_snprintf = snprintf(jsonBuffer + strlen(jsonBuffer), remain_size, "%"

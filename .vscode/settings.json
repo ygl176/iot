@@ -3,6 +3,10 @@
         "string.h": "c",
         "mqtt.h": "c",
         "_intsup.h": "c",
-        "newlib.h": "c"
+        "newlib.h": "c",
+        "stddef.h": "c",
+        "lite-utils.h": "c",
+        "qcloud_iot_api_export.h": "c",
+        "module_api_inf.h": "c"
     }
 }

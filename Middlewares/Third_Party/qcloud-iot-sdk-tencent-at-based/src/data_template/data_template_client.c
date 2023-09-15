@@ -258,6 +258,8 @@ int IOT_Template_JSON_ConstructReportArray(void *handle, char *jsonBuffer, size_
 	int rc;
     int8_t i;
 
+    memset(jsonBuffer, 0, sizeOfBuffer);
+
 
 	build_empty_json(&(ptemplate->inner_data.token_num), jsonBuffer);
 	if ((remain_size = sizeOfBuffer - strlen(jsonBuffer)) <= 1) {

@@ -33,6 +33,7 @@
 #endif
 
 #include "lite-list.h"
+#include "usart.h"
 // #include "hal_export.h"
 #include "common.h"
 #include "config.h"
@@ -55,7 +56,7 @@
 #define LITE_ASSERT(expr) \
     do { \
         if (!(expr)) { \
-            HAL_Printf("### %s | %s(%d): ASSERT FAILED ###: %s is FALSE\r\n", \
+            usart_printf(&huart2 ,"### %s | %s(%d): ASSERT FAILED ###: %s is FALSE\r\n", \
                         __FILE__, __func__, __LINE__, #expr); \
         } \
     } while(0)

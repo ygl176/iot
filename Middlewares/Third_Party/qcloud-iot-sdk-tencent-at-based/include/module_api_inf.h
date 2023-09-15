@@ -45,6 +45,7 @@ eAtResault module_mqtt_state(eMqtt_State *pState);
 eAtResault set_module_debug_level(int Log_level);
 eAtResault module_register_network(eModuleType eType);
 
+void mqtt_connect_check();
 
 bool IOT_MQTT_IsConnected(void);
 
