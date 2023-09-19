@@ -7,6 +7,7 @@
         "stddef.h": "c",
         "lite-utils.h": "c",
         "qcloud_iot_api_export.h": "c",
-        "module_api_inf.h": "c"
+        "module_api_inf.h": "c",
+        "common.h": "c"
     }
 }

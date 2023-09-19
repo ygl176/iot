@@ -17,17 +17,20 @@
 #include "lite-utils.h"
 // #include "at_client.h"
 #include "mqtt.h"
+#include "bsp_dh11.h"
 #include "string.h"
 #include "utils_timer.h"
 #include "bsp_at_esp8266.h"
 
 
-#define TOTAL_PROPERTY_COUNT 1
+#define TOTAL_PROPERTY_COUNT 3
 
 static sDataPoint    sg_DataTemplate[TOTAL_PROPERTY_COUNT];
 
 typedef struct _ProductDataDefine {
     TYPE_DEF_TEMPLATE_BOOL m_led;
+	TYPE_DEF_TEMPLATE_FLOAT temp;
+	TYPE_DEF_TEMPLATE_FLOAT humi;
 } ProductDataDefine;
 
 static   ProductDataDefine     sg_ProductData;
@@ -39,6 +42,15 @@ static void _init_data_template(void)
     sg_DataTemplate[0].data_property.key  = "led";
     sg_DataTemplate[0].data_property.type = TYPE_TEMPLATE_BOOL;
 
+	sg_ProductData.temp = 0.0;
+    sg_DataTemplate[1].data_property.data = &sg_ProductData.temp;
+    sg_DataTemplate[1].data_property.key  = "temperature";
+    sg_DataTemplate[1].data_property.type = TYPE_TEMPLATE_FLOAT;
+
+	sg_ProductData.humi = 0.0;
+    sg_DataTemplate[2].data_property.data = &sg_ProductData.humi;
+    sg_DataTemplate[2].data_property.key  = "humidity";
+    sg_DataTemplate[2].data_property.type = TYPE_TEMPLATE_FLOAT;
 };
 
 #define CYCLE_TIME_MS		(5000)
@@ -242,10 +254,14 @@ static void cycle_report_info(Timer *pTimer,ProductDataDefine *pWorkshop)
 	/*只读数据定时巡检上报*/
 	if(expired(pTimer)){
 		// mqtt_connect_check();
+		
+		dh11_get_data(&sg_ProductData.temp, &sg_ProductData.humi);
 
-		set_propery_changed(&sg_ProductData.m_led);
+		set_propery_changed(&sg_ProductData.humi);
+		set_propery_changed(&sg_ProductData.temp);
 
-		Log_d("LED: %d", sg_ProductData.m_led);
+		Log_d("temprature:%.1f, humidity:%.1f", sg_ProductData.temp, sg_ProductData.humi);
+
 		countdown_ms(pTimer, CYCLE_TIME_MS);
 	}
 	
