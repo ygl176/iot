@@ -21,8 +21,8 @@ extern void IOT_Template_Message_Arrived_CallBack(const char *data, int size);
 
 #define ESP_UART    (&huart1)
 #define AT_WAIT_MS  5000
-#define WIFI_ID			"Redmi K40"
-#define WIFI_PASS		"qweasd4848"
+#define WIFI_ID			""
+#define WIFI_PASS		""
 
 sRingbuff esp_ring_buff;
 static bsp_esp8266 esp;

@@ -62,6 +62,8 @@ LOG_LEVEL Log_Get_Level(void);
  */
 void Log_writter(const char *file, const char *func, const int line, const int level, const char *fmt, ...);
 
+
+//自定义 log 使能
 #ifdef LOG
 
 #define Log_d(args...) Log_writter(__FILE__, __FUNCTION__, __LINE__, LOG_DEBUG, args)

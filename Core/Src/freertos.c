@@ -143,18 +143,6 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-//  ESP8266_Init();
-//
-//  Log_i("esp ok");
-//
-//  mqtt_init();
-//
-//  mqtt_connect((uint8_t*)CLIENT_ID, (uint8_t*)DEVICE_NAME, (uint8_t*)DEVICE_KEY, 120);
-//
-//  mqtt_subscribe((uint8_t*)SUB_TOPIC, 0, 0);
-//
-//  if(mqtt_ping())
-//    Log_i("mqtt ok");
 
    data_template_sample();
 
