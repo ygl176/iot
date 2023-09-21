@@ -83,3 +83,9 @@ bool mqtt_publish(uint8_t* pub_topic, uint8_t* payload);
 //心跳
 bool mqtt_ping();
 ```
+
+## 功能实现
+
+```c
+void data_template_demo_task(void *arg);
+```
